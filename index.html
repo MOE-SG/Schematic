@@ -963,7 +963,10 @@
         const TB_VALUE = "#0000ff";
 
         function drawBordersAndZones() {
-            const inchPx = 96; const offsetOuter = 15; const offsetInner = 35;
+            // canvas is sized to A3-landscape's aspect ratio (420mm x 297mm), so derive
+            // the true pixels-per-inch from that physical size rather than assuming 96px/in
+            const inchPx = canvas.width / (420 / 25.4);
+            const offsetOuter = 15; const offsetInner = 35;
             ctx.strokeStyle = SHEET_RED; ctx.lineWidth = 2.25; ctx.strokeRect(offsetInner, offsetInner, canvas.width - (offsetInner * 2), canvas.height - (offsetInner * 2));
             ctx.lineWidth = 0.75; ctx.strokeStyle = SHEET_RED; ctx.strokeRect(offsetOuter, offsetOuter, canvas.width - (offsetOuter * 2), canvas.height - (offsetOuter * 2));
             ctx.fillStyle = SHEET_RED; ctx.font = "bold 11px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
