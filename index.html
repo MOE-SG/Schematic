@@ -233,6 +233,7 @@
             <span class="group-label">Output</span>
             <div class="group-row">
                 <button class="btn btn-green" onclick="exportAsDXF()" title="Export DXF">⇩ DXF</button>
+                <button class="btn btn-orange" onclick="exportAsJPG()" title="Export JPG image">🖼️ JPG</button>
                 <button class="btn btn-blue" onclick="printSchematicSheet()" title="Print sheet">🖨️ Print</button>
             </div>
         </div>
@@ -1543,6 +1544,16 @@
 
         function createNewFile() { if (confirm("Clear canvas schematic data?")) { projectData.components = []; projectData.wires = []; projectData.customImages = []; projectData.annotations = []; projectData.shapes = []; closeInspector(); resetZoomView(); } }
         function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData)); const downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", `system_schema.json`); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
+
+        function exportAsJPG() {
+            const savedGrp = selectedEntities; selectedEntities = []; drawCanvas();
+            const imageDataUri = canvas.toDataURL("image/jpeg", 0.95);
+            selectedEntities = savedGrp; requestRender();
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", imageDataUri);
+            downloadAnchor.setAttribute("download", `${(projectData.titleBlock && projectData.titleBlock.docId) || 'schematic_sheet'}.jpg`);
+            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+        }
 
         function importJSON(event) {
             const file = event.target.files[0]; if (!file) return;
