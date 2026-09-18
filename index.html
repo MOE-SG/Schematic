@@ -139,6 +139,7 @@
             position: relative;
             overflow: hidden; 
             cursor: crosshair;
+            touch-action: none;
         }
 
         canvas {
@@ -223,9 +224,64 @@
         .bom-meta { font-size: 11.5px; color: #444; margin-bottom: 10px; display: flex; gap: 22px; flex-wrap: wrap; }
         .bom-meta strong { color: #870000; }
         .bom-empty { padding: 30px; text-align: center; color: #888; font-size: 13px; }
+
+        .hamburger-btn { display: none; font-size: 16px; padding: 6px 10px; }
+        .toolbar-groups-wrap { display: contents; }
+
+        /* ===================== Phone / narrow-screen support ===================== */
+        @media (max-width: 900px) {
+            header { padding: 6px 10px; gap: 10px; position: relative; }
+            .brand-sub { display: none; }
+            .hamburger-btn { display: inline-flex; align-items: center; justify-content: center; }
+
+            .toolbar-groups-wrap {
+                display: none;
+                position: absolute; top: 100%; left: 0; right: 0;
+                background: #26272b; border-bottom: 2px solid #7a0000;
+                flex-direction: column; align-items: stretch; gap: 0;
+                max-height: 75vh; overflow-y: auto; z-index: 80;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+                padding: 6px 10px 10px 10px;
+            }
+            .toolbar-groups-wrap.open { display: flex; }
+            .toolbar-groups-wrap .separator.tall { display: none; }
+            .toolbar-groups-wrap .toolbar-group {
+                border-bottom: 1px solid #3d3e42; padding: 8px 2px; width: 100%;
+            }
+            .toolbar-groups-wrap .toolbar-group:last-child { border-bottom: none; }
+            .toolbar-groups-wrap .group-row { flex-wrap: wrap; row-gap: 6px; }
+            .toolbar-groups-wrap .btn, .toolbar-groups-wrap select { padding: 8px 12px; font-size: 13px; }
+
+            .status-bar { margin-left: auto; gap: 8px; font-size: 10.5px; }
+            .status-bar span:not(.sheet-tag) { display: none; }
+
+            /* Sidebars become overlay drawers instead of squeezing the canvas */
+            .sidebar-wrapper:not(.collapsed) {
+                position: absolute; top: 0; left: 0; height: 100%;
+                width: min(86vw, 300px); z-index: 60;
+                box-shadow: 6px 0 20px rgba(0,0,0,0.55);
+            }
+            .props-wrapper:not(.collapsed) {
+                position: absolute; top: 0; right: 0; height: 100%;
+                width: min(86vw, 300px); z-index: 60;
+                box-shadow: -6px 0 20px rgba(0,0,0,0.55);
+            }
+            .toggle-tab-left, .toggle-tab { width: 34px; font-size: 13px; }
+            .sidebar-wrapper.collapsed, .props-wrapper.collapsed { width: 34px; }
+
+            .lib-item, .prop-group label, .prop-group input { font-size: 13px; }
+            .panel-title { font-size: 12px; }
+
+            .modal-box { max-width: 96vw; max-height: 92vh; }
+            .modal-body { padding: 10px 12px; overflow-x: auto; }
+            .modal-footer { flex-wrap: wrap; }
+            .modal-footer .btn { flex: 1; min-width: 120px; padding: 10px; }
+            table.bom-table { font-size: 11px; }
+        }
     </style>
 </head>
 <body>
+
 
     <header>
         <div class="brand">
@@ -233,8 +289,11 @@
             <div class="brand-sub">Schematic &amp; Panel Documentation Workspace</div>
         </div>
 
+        <button class="btn hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" title="Menu">☰</button>
+
         <div class="separator tall"></div>
 
+        <div class="toolbar-groups-wrap" id="toolbarGroupsWrap">
         <div class="toolbar-group">
             <span class="group-label">File</span>
             <div class="group-row">
@@ -302,6 +361,7 @@
                 </select>
                 <button class="btn" onclick="resetZoomView()" title="Fit to view">🔍 Fit</button>
             </div>
+        </div>
         </div>
 
         <div class="status-bar">
@@ -426,7 +486,9 @@
                     • <strong>Spacebar:</strong> rotate the highlighted selection 90°.
                 </div>
                 <div style="font-size:11px; color:#888; margin-top:14px; border-top:1px solid #ddd; padding-top:8px;">
-                    Built for SOE MOE ENTERPRISES. All project data stays local in your browser — nothing is uploaded to a server.
+                    Works on phones and tablets too — tap ☰ for the toolbar, ◂▸ for the library/inspector,
+                    and pinch with two fingers to zoom. Built for SOE MOE ENTERPRISES; all project data
+                    stays local in your browser — nothing is uploaded to a server.
                 </div>
             </div>
         </div>
@@ -650,12 +712,31 @@
         let globalSelectedColor = "#000000"; 
         let currentMouseModelPos = { x: 0, y: 0 };
 
+        const MOBILE_BREAKPOINT = 900;
+
         window.onload = () => {
             renderLibrary(); 
             setTimeout(resetZoomView, 100);
             setupInteractions();
+            setupTouchSupport();
+            if (window.innerWidth <= MOBILE_BREAKPOINT) {
+                document.getElementById('leftSidebarPanel').classList.add('collapsed');
+                document.getElementById('rightPropsPanel').classList.add('collapsed');
+            }
             window.addEventListener('resize', () => { resetZoomView(); });
+            document.getElementById('toolbarGroupsWrap').addEventListener('click', (e) => { if (e.target.closest('button')) closeMobileMenuIfOpen(); });
         };
+
+        function toggleMobileMenu() {
+            const wrap = document.getElementById('toolbarGroupsWrap');
+            const btn = document.getElementById('hamburgerBtn');
+            const isOpen = wrap.classList.toggle('open');
+            btn.innerText = isOpen ? "✕" : "☰";
+        }
+        function closeMobileMenuIfOpen() {
+            const wrap = document.getElementById('toolbarGroupsWrap');
+            if (wrap.classList.contains('open')) { wrap.classList.remove('open'); document.getElementById('hamburgerBtn').innerText = "☰"; }
+        }
 
         function toggleLeftPanel() { document.getElementById('leftSidebarPanel').classList.toggle('collapsed'); setTimeout(resetZoomView, 160); }
         function toggleRightPanel() { document.getElementById('rightPropsPanel').classList.toggle('collapsed'); setTimeout(resetZoomView, 160); }
@@ -1605,6 +1686,79 @@
 					}
 				}
 			});
+        }
+
+        // ---------- Touch / phone support ----------
+        // Single-finger touches are re-dispatched as the equivalent mouse events so all
+        // existing drawing/selection logic (written for mouse input) works unchanged.
+        // Two-finger touches are handled separately for pinch-zoom + two-finger pan.
+        function setupTouchSupport() {
+            let touchMode = null; // 'draw' | 'gesture'
+            let pinchStart = null;
+
+            function dispatchMouseFromTouch(touch, type) {
+                const evt = new MouseEvent(type, {
+                    bubbles: true, cancelable: true, view: window,
+                    clientX: touch.clientX, clientY: touch.clientY,
+                    button: 0, buttons: type === 'mouseup' ? 0 : 1
+                });
+                (document.elementFromPoint(touch.clientX, touch.clientY) || viewport).dispatchEvent(evt);
+            }
+
+            function computePinchState(e) {
+                const rect = viewport.getBoundingClientRect();
+                const t0 = e.touches[0], t1 = e.touches[1];
+                const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+                const midX = (t0.clientX + t1.clientX) / 2 - rect.left;
+                const midY = (t0.clientY + t1.clientY) / 2 - rect.top;
+                return { dist, midX, midY };
+            }
+
+            viewport.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    touchMode = 'draw';
+                    dispatchMouseFromTouch(e.touches[0], 'mousedown');
+                } else if (e.touches.length >= 2) {
+                    if (touchMode === 'draw') { dispatchMouseFromTouch(e.touches[0], 'mouseup'); }
+                    touchMode = 'gesture';
+                    const p = computePinchState(e);
+                    pinchStart = { dist: p.dist, midX: p.midX, midY: p.midY, scale: viewScale, panX: viewPanX, panY: viewPanY };
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            viewport.addEventListener('touchmove', (e) => {
+                if (touchMode === 'draw' && e.touches.length === 1) {
+                    dispatchMouseFromTouch(e.touches[0], 'mousemove');
+                } else if (touchMode === 'gesture' && e.touches.length >= 2) {
+                    const p = computePinchState(e);
+                    if (!pinchStart) {
+                        pinchStart = { dist: p.dist, midX: p.midX, midY: p.midY, scale: viewScale, panX: viewPanX, panY: viewPanY };
+                    } else {
+                        const newScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchStart.scale * (p.dist / pinchStart.dist)));
+                        const modelAnchorX = (pinchStart.midX - pinchStart.panX) / pinchStart.scale;
+                        const modelAnchorY = (pinchStart.midY - pinchStart.panY) / pinchStart.scale;
+                        viewScale = newScale;
+                        viewPanX = p.midX - modelAnchorX * viewScale;
+                        viewPanY = p.midY - modelAnchorY * viewScale;
+                        applyTransformMatrix(); requestRender();
+                    }
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            viewport.addEventListener('touchend', (e) => {
+                if (touchMode === 'draw') {
+                    dispatchMouseFromTouch(e.changedTouches[0], 'mouseup');
+                }
+                if (e.touches.length < 2) { pinchStart = null; if (e.touches.length === 0) touchMode = null; }
+                e.preventDefault();
+            }, { passive: false });
+
+            viewport.addEventListener('touchcancel', (e) => {
+                if (touchMode === 'draw') { dispatchMouseFromTouch(e.changedTouches[0], 'mouseup'); }
+                touchMode = null; pinchStart = null;
+            }, { passive: false });
         }
 
         function setMode(mode) { currentMode = mode; document.getElementById('currentMode').innerText = mode; }

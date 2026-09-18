@@ -141,9 +141,21 @@ This makes projects easy to version-control, diff, or script against outside the
 
 ## Browser Support
 
-Any current desktop browser with Canvas2D support (Chrome, Edge, Firefox, Safari).
-Printing uses `@page` sizing for exact, borderless A3 output — tested in Chromium-based
-browsers; other browsers should honor the same CSS but may vary slightly in print preview.
+Any current desktop or mobile browser with Canvas2D support (Chrome, Edge, Firefox,
+Safari). Printing uses `@page` sizing for exact, borderless A3 output — tested in
+Chromium-based browsers; other browsers should honor the same CSS but may vary slightly
+in print preview.
+
+### Phone / touch support
+
+- Below ~900px wide, the header toolbar collapses into a **☰** menu button; tap it to
+  open a full-width dropdown with all the same File/Output/Parts/Insert/Draw/View groups.
+- The component library and inspector sidebars become slide-over drawers (tap the
+  **◂▸** tab on either edge) instead of squeezing the canvas, and start collapsed on
+  phone-sized screens so the sheet is visible immediately.
+- Single-finger touch drags draw, select, and move elements exactly like a mouse.
+- **Pinch with two fingers** to zoom, and drag with two fingers to pan — anchored under
+  your fingers the same way scroll-wheel zoom is anchored under the cursor on desktop.
 
 ## Known Limitations
 
@@ -154,8 +166,4 @@ browsers; other browsers should honor the same CSS but may vary slightly in prin
 
 ---
 
-## License
-
-MIT License
-Copyright (c) 2026 Soe Moe
 *Built for SOE MOE ENTERPRISES.*
