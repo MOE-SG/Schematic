@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebEDA Studio Pro - Advanced Automation & System Workspace</title>
+    <title>Moe's Schematic — A3 Schematic & Panel Documentation</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#870000">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Moe's Schematic">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -285,7 +296,7 @@
 
     <header>
         <div class="brand">
-            <h1>WebEDA <span>PRO</span></h1>
+            <h1>Moe's <span>Schematic</span></h1>
             <div class="brand-sub">Schematic &amp; Panel Documentation Workspace</div>
         </div>
 
@@ -368,7 +379,8 @@
             <span>Zoom: <strong id="zoomIndicator">100%</strong></span>
             <span>Mode: <strong id="currentMode">SELECT</strong></span>
             <span class="sheet-tag">A3 · LANDSCAPE</span>
-            <button class="btn" id="aboutBtn" onclick="openAboutModal()" title="About WebEDA Pro" style="border-radius:50%; width:24px; height:24px; padding:0; font-weight:bold;">?</button>
+            <button class="btn" id="installAppBtn" onclick="triggerInstallPrompt()" title="Install Moe's Schematic as an app" style="display:none; background-color:#870000; font-weight:bold;">📲 Install</button>
+            <button class="btn" id="aboutBtn" onclick="openAboutModal()" title="About Moe's Schematic" style="border-radius:50%; width:24px; height:24px; padding:0; font-weight:bold;">?</button>
         </div>
     </header>
 
@@ -457,12 +469,12 @@
     <div class="modal-overlay" id="aboutModalOverlay">
         <div class="modal-box" style="max-width: 640px;">
             <div class="modal-header">
-                <h2>ℹ️ About WebEDA Pro</h2>
+                <h2>ℹ️ About Moe's Schematic</h2>
                 <button class="btn" onclick="closeAboutModal()">✕ Close</button>
             </div>
             <div class="modal-body">
                 <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:4px;">
-                    <span style="font-size:20px; font-weight:800;">WebEDA <span style="color:#870000;">PRO</span></span>
+                    <span style="font-size:20px; font-weight:800;">Moe's <span style="color:#870000;">Schematic</span></span>
                     <span style="font-size:12px; color:#666;">v1.0 &nbsp;·&nbsp; Schematic &amp; Panel Documentation Workspace</span>
                 </div>
                 <p style="font-size:12.5px; color:#333; line-height:1.5; margin-top:10px;">
@@ -491,9 +503,12 @@
                     • <strong>Spacebar:</strong> rotate the highlighted selection 90°.
                 </div>
                 <div style="font-size:11px; color:#888; margin-top:14px; border-top:1px solid #ddd; padding-top:8px;">
-                    Works on phones and tablets too — tap ☰ for the toolbar, ◂▸ for the library/inspector,
-                    and pinch with two fingers to zoom. Built for SOE MOE ENTERPRISES; all project data
-                    stays local in your browser — nothing is uploaded to a server.
+                    Installable as an app — use the 📲 Install button in the header (or your
+                    browser's install/Add to Home Screen option) to run it in its own window,
+                    with offline support after the first visit. Works on phones and tablets too —
+                    tap ☰ for the toolbar, ◂▸ for the library/inspector, and pinch with two fingers
+                    to zoom. Built for SOE MOE ENTERPRISES; all project data stays local in your
+                    browser — nothing is uploaded to a server.
                 </div>
             </div>
         </div>
@@ -724,6 +739,7 @@
             setTimeout(resetZoomView, 100);
             setupInteractions();
             setupTouchSupport();
+            setupPWA();
             if (window.innerWidth <= MOBILE_BREAKPOINT) {
                 document.getElementById('leftSidebarPanel').classList.add('collapsed');
                 document.getElementById('rightPropsPanel').classList.add('collapsed');
@@ -731,6 +747,34 @@
             window.addEventListener('resize', () => { resetZoomView(); });
             document.getElementById('toolbarGroupsWrap').addEventListener('click', (e) => { if (e.target.closest('button')) closeMobileMenuIfOpen(); });
         };
+
+        // ---------- PWA: install prompt + service worker ----------
+        let deferredInstallPrompt = null;
+        function setupPWA() {
+            if ('serviceWorker' in navigator) {
+                // Registration only succeeds when served over http(s)/localhost; silently
+                // ignored when opened directly as a local file (file://), which still works
+                // as a normal single-file app, just without offline caching or installability.
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            }
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredInstallPrompt = e;
+                document.getElementById('installAppBtn').style.display = 'inline-flex';
+            });
+            window.addEventListener('appinstalled', () => {
+                deferredInstallPrompt = null;
+                document.getElementById('installAppBtn').style.display = 'none';
+            });
+        }
+        function triggerInstallPrompt() {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            deferredInstallPrompt.userChoice.finally(() => {
+                deferredInstallPrompt = null;
+                document.getElementById('installAppBtn').style.display = 'none';
+            });
+        }
 
         function toggleMobileMenu() {
             const wrap = document.getElementById('toolbarGroupsWrap');

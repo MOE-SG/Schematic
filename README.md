@@ -1,17 +1,21 @@
-# WebEDA Pro
+# Moe's Schematic
 
 **Schematic & Panel Documentation Workspace**
 
-WebEDA Pro is a self-contained, browser-based schematic capture tool. It runs entirely
-client-side from a single `index.html` file — no install, account, build step, or server
-required. Every drawing lives on an A3 landscape sheet with a red ASME-style border,
-inch-accurate zone references, and a fully editable engineering title block.
+Moe's Schematic is a self-contained, browser-based schematic capture tool, installable
+as a PWA (Progressive Web App). At its core it's a single `index.html` file — no
+account, build step, or server required to just open and use it — with an optional
+`manifest.json`, `sw.js` (service worker), and a few icon files alongside it that
+enable installing it as a standalone app with offline support. Every drawing lives on
+an A3 landscape sheet with a red ASME-style border, inch-accurate zone references, and
+a fully editable engineering title block.
 
 ---
 
 ## Contents
 
 - [Getting Started](#getting-started)
+- [Installing as an App (PWA)](#installing-as-an-app-pwa)
 - [Sheet & Title Block](#sheet--title-block)
 - [Toolbar Reference](#toolbar-reference)
 - [Component Library](#component-library)
@@ -39,6 +43,29 @@ inch-accurate zone references, and a fully editable engineering title block.
 
 All project data stays in your browser session and any files you explicitly save —
 nothing is uploaded to a server.
+
+---
+
+## Installing as an App (PWA)
+
+Moe's Schematic can be installed like a native app (its own window, an icon on your
+home screen/dock, and offline support after the first visit), when served over
+**HTTPS or `localhost`** — browsers block service workers and install prompts on a
+plain `file://` page, so this only applies when you host the folder (e.g. GitHub
+Pages, or any static web host).
+
+1. Serve the folder containing `index.html`, `manifest.json`, `sw.js`, and the
+   `icon-*.png` files together (they must stay alongside each other).
+2. Open it in Chrome, Edge, or another PWA-capable browser.
+3. Click the **📲 Install** button that appears in the header once the browser
+   decides the app is installable (or use your browser's own install / "Add to
+   Home Screen" option — the button is a shortcut to the same prompt, not the
+   only way to install).
+4. The installed app opens in its own window and keeps working offline after
+   that first successful load, since the service worker caches the app shell.
+
+If you just double-click `index.html` locally instead, everything still works
+exactly as before — you simply won't get the install prompt or offline caching.
 
 ---
 
