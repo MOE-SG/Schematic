@@ -205,6 +205,24 @@
         
         .pin-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; background: #333; padding: 3px; border-radius: 2px; }
         .pin-row input { width: 45px; background: #161616; border: 1px solid #555; color: white; font-size: 11px; text-align: center; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: #f4f4f4; color: #1a1a1a; width: 90%; max-width: 960px; max-height: 88vh; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { background: #2f3136; color: #fff; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #7a0000; }
+        .modal-header h2 { margin: 0; font-size: 15px; }
+        .modal-header .btn { background: #555; }
+        .modal-body { padding: 14px 18px; overflow-y: auto; background: #fff; }
+        .modal-footer { padding: 10px 18px; background: #eaeaea; border-top: 1px solid #ccc; display: flex; gap: 8px; justify-content: flex-end; }
+        table.bom-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        table.bom-table th, table.bom-table td { border: 1px solid #870000; padding: 5px 8px; text-align: left; }
+        table.bom-table th { background: #870000; color: #fff; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.4px; }
+        table.bom-table tr:nth-child(even) { background: #f7eeee; }
+        table.bom-table td.num { text-align: center; width: 46px; }
+        table.bom-table td.qty { text-align: center; width: 56px; font-weight: bold; }
+        .bom-meta { font-size: 11.5px; color: #444; margin-bottom: 10px; display: flex; gap: 22px; flex-wrap: wrap; }
+        .bom-meta strong { color: #870000; }
+        .bom-empty { padding: 30px; text-align: center; color: #888; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -235,6 +253,15 @@
                 <button class="btn btn-green" onclick="exportAsDXF()" title="Export DXF">⇩ DXF</button>
                 <button class="btn btn-orange" onclick="exportAsJPG()" title="Export JPG image">🖼️ JPG</button>
                 <button class="btn btn-blue" onclick="printSchematicSheet()" title="Print sheet">🖨️ Print</button>
+            </div>
+        </div>
+
+        <div class="separator tall"></div>
+
+        <div class="toolbar-group">
+            <span class="group-label">Parts</span>
+            <div class="group-row">
+                <button class="btn" style="background-color:#7a0000;" onclick="openBOMModal()" title="Generate Bill of Materials">📋 BOM</button>
             </div>
         </div>
 
@@ -320,6 +347,10 @@
                         <label id="inspectNameLabel">Designator Name</label>
                         <input type="text" id="inspectNameInput" oninput="applyInspectorChange()">
                     </div>
+                    <div class="prop-group" id="inspectValueGroup" style="display:none;">
+                        <label>Value / Rating</label>
+                        <input type="text" id="inspectValueInput" placeholder="e.g. 10k, 100nF, 1N4148" oninput="applyInspectorChange()">
+                    </div>
                     <div class="prop-group" id="inspectVisibilityGroup" style="flex-direction: row; align-items: center; gap: 8px; margin: 8px 0;">
                         <input type="checkbox" id="inspectVisibilityInput" onchange="applyInspectorChange()">
                         <label for="inspectVisibilityInput" style="cursor:pointer; font-size:11px;">Show Label</label>
@@ -339,6 +370,20 @@
                 <div class="prop-group"><label>Tolerance — line 1</label><input type="text" id="tbTol1" value=".0    = ± .05" oninput="updateTitleBlock()"></div>
                 <div class="prop-group"><label>Tolerance — line 2</label><input type="text" id="tbTol2" value=".00   = ± .01" oninput="updateTitleBlock()"></div>
                 <div class="prop-group"><label>Tolerance — line 3</label><input type="text" id="tbTol3" value=".000  = ± .005" oninput="updateTitleBlock()"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="bomModalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>📋 Bill of Materials</h2>
+                <button class="btn" onclick="closeBOMModal()">✕ Close</button>
+            </div>
+            <div class="modal-body" id="bomModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-green" onclick="exportBOMCSV()">⇩ Export CSV</button>
+                <button class="btn btn-blue" onclick="printBOMSheet()">🖨️ Print BOM</button>
             </div>
         </div>
     </div>
@@ -633,6 +678,8 @@
             const nameInput = document.getElementById('inspectNameInput');
             const visGroup = document.getElementById('inspectVisibilityGroup');
             const visInput = document.getElementById('inspectVisibilityInput');
+            const valueGroup = document.getElementById('inspectValueGroup');
+            const valueInput = document.getElementById('inspectValueInput');
             
             panel.style.display = "block";
             document.getElementById('globalColorInput').value = entity.color || "#000000";
@@ -640,7 +687,7 @@
 
             if (selectedEntities.length > 1) {
                 headerTitle.innerText = `Selection Group (${selectedEntities.length} Items)`;
-                nameGroup.style.display = "none"; visGroup.style.display = "none";
+                nameGroup.style.display = "none"; visGroup.style.display = "none"; valueGroup.style.display = "none";
                 document.getElementById('pinMatrixManagerContainer').innerHTML = "";
             } else {
                 nameGroup.style.display = "flex"; visGroup.style.display = "flex";
@@ -648,14 +695,17 @@
                     headerTitle.innerText = type === 'COMP' ? "Component Inspector" : "Imported Footprint"; 
                     nameLabel.innerText = "Designator Alphanumeric";
                     nameInput.value = entity.refDes || ""; visInput.checked = entity.showLabel !== false;
+                    if (type === 'COMP') { valueGroup.style.display = "flex"; valueInput.value = entity.value || ""; }
+                    else { valueGroup.style.display = "none"; }
                 } else if (type === 'TEXT') {
                     headerTitle.innerText = "Typography Inspector"; nameLabel.innerText = "Annotation String";
                     nameInput.value = entity.text || ""; visInput.checked = entity.showLabel !== false;
+                    valueGroup.style.display = "none";
                 } else if (type === 'WIRE' || type === 'SHAPE') {
                     headerTitle.innerText = type === 'WIRE' ? "Connection Net Wire" : "Shape Object Layout";
-                    nameGroup.style.display = "none"; visGroup.style.display = "none";
+                    nameGroup.style.display = "none"; visGroup.style.display = "none"; valueGroup.style.display = "none";
                 } else {
-                    nameGroup.style.display = "none"; visGroup.style.display = "none";
+                    nameGroup.style.display = "none"; visGroup.style.display = "none"; valueGroup.style.display = "none";
                 }
                 rebuildPinMatrixUI(entity);
             }
@@ -669,7 +719,8 @@
             let active = selectedEntities[0];
             const nameInput = document.getElementById('inspectNameInput').value;
             const visInput = document.getElementById('inspectVisibilityInput').checked;
-            if (active.type === 'COMP' || active.type === 'IMG') { active.entity.refDes = nameInput; active.entity.showLabel = visInput; }
+            if (active.type === 'COMP') { active.entity.refDes = nameInput; active.entity.showLabel = visInput; active.entity.value = document.getElementById('inspectValueInput').value; }
+            else if (active.type === 'IMG') { active.entity.refDes = nameInput; active.entity.showLabel = visInput; }
             else if (active.type === 'TEXT') { active.entity.text = nameInput; active.entity.showLabel = visInput; }
             requestRender();
         }
@@ -1262,10 +1313,10 @@
 				}
 
 				if (currentMode === 'PLACE' && selectedLibraryPart) {
-					const count = projectData.components.filter(c => c.type === selectedLibraryPart.type).length + 1;
+					const count = projectData.components.filter(c => c.prefix === selectedLibraryPart.prefix).length + 1;
 					let newPart = { 
 						...selectedLibraryPart, id: Date.now(), x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y), 
-						refDes: `${selectedLibraryPart.prefix}${count}`, showLabel: true, color: globalSelectedColor, rotation: 0,
+						refDes: `${selectedLibraryPart.prefix}${count}`, value: "", showLabel: true, color: globalSelectedColor, rotation: 0,
 						pins: selectedLibraryPart.pins.map(p => ({...p}))
 					};
 					projectData.components.push(newPart);
@@ -1558,6 +1609,107 @@
             downloadAnchor.setAttribute("href", imageDataUri);
             downloadAnchor.setAttribute("download", `${(projectData.titleBlock && projectData.titleBlock.docId) || 'schematic_sheet'}.jpg`);
             document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+        }
+
+        // ---------- Bill of Materials ----------
+        function escBOM(s) { return (s === undefined || s === null) ? "" : String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+        function generateBOMData() {
+            const groups = {};
+            projectData.components.forEach(comp => {
+                const key = `${comp.type}||${comp.value || ""}`;
+                if (!groups[key]) {
+                    groups[key] = { name: comp.name || comp.type, category: comp.category || "", value: comp.value || "", refDes: [], qty: 0 };
+                }
+                groups[key].refDes.push(comp.refDes || "?");
+                groups[key].qty++;
+            });
+            const rows = Object.values(groups);
+            // Natural sort of ref-designators within a group (R1, R2, R10 ... not R1, R10, R2)
+            rows.forEach(r => r.refDes.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+            rows.sort((a, b) => a.name.localeCompare(b.name) || a.value.localeCompare(b.value));
+            return rows;
+        }
+
+        function buildBOMTableHTML(rows) {
+            if (!rows.length) return `<div class="bom-empty">No components placed on the sheet yet.</div>`;
+            let html = `<table class="bom-table"><thead><tr>
+                <th class="num">Item</th><th class="qty">Qty</th><th>Reference Designator(s)</th><th>Description</th><th>Value / Rating</th><th>Category</th>
+            </tr></thead><tbody>`;
+            rows.forEach((r, i) => {
+                html += `<tr>
+                    <td class="num">${i + 1}</td>
+                    <td class="qty">${r.qty}</td>
+                    <td>${escBOM(r.refDes.join(', '))}</td>
+                    <td>${escBOM(r.name)}</td>
+                    <td>${escBOM(r.value)}</td>
+                    <td>${escBOM(r.category)}</td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function openBOMModal() {
+            const rows = generateBOMData();
+            const tb = projectData.titleBlock;
+            const totalParts = rows.reduce((sum, r) => sum + r.qty, 0);
+            const metaHTML = `<div class="bom-meta">
+                <span><strong>Doc:</strong> ${escBOM(tb.docId)}</span>
+                <span><strong>Rev:</strong> ${escBOM(tb.rev)}</span>
+                <span><strong>Company:</strong> ${escBOM(tb.company)}</span>
+                <span><strong>Line Items:</strong> ${rows.length}</span>
+                <span><strong>Total Parts:</strong> ${totalParts}</span>
+            </div>`;
+            document.getElementById('bomModalBody').innerHTML = metaHTML + buildBOMTableHTML(rows);
+            document.getElementById('bomModalOverlay').classList.add('open');
+        }
+
+        function closeBOMModal() { document.getElementById('bomModalOverlay').classList.remove('open'); }
+
+        function exportBOMCSV() {
+            const rows = generateBOMData();
+            let csv = "Item,Qty,Reference Designators,Description,Value,Category\n";
+            rows.forEach((r, i) => {
+                const line = [i + 1, r.qty, r.refDes.join(' '), r.name, r.value, r.category]
+                    .map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+                csv += line + "\n";
+            });
+            const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `${(projectData.titleBlock && projectData.titleBlock.docId) || 'schematic'}_BOM.csv`);
+            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+        }
+
+        function printBOMSheet() {
+            const rows = generateBOMData();
+            const tb = projectData.titleBlock;
+            const tableHTML = buildBOMTableHTML(rows);
+            const printSubWindow = window.open('', '_blank');
+            printSubWindow.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>BOM - ${escBOM(tb.docId)}</title><style>
+                @page { size: A4 portrait; margin: 14mm; }
+                * { box-sizing: border-box; }
+                body { font-family: Arial, sans-serif; color: #111; margin: 0; }
+                h1 { font-size: 16px; margin: 0 0 4px 0; color: #870000; }
+                .hdr { border-bottom: 2px solid #870000; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+                .hdr-meta { font-size: 11px; color: #333; text-align: right; line-height: 1.5; }
+                table.bom-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+                table.bom-table th, table.bom-table td { border: 1px solid #870000; padding: 5px 8px; text-align: left; }
+                table.bom-table th { background: #870000; color: #fff; text-transform: uppercase; font-size: 10px; }
+                table.bom-table tr:nth-child(even) { background: #f7eeee; }
+                table.bom-table td:first-child, table.bom-table td:nth-child(2) { text-align: center; }
+            </style></head><body onload="window.print()">
+                <div class="hdr">
+                    <div><h1>Bill of Materials</h1><div style="font-size:12px;">${escBOM(tb.company)}</div></div>
+                    <div class="hdr-meta">
+                        <div><strong>Doc:</strong> ${escBOM(tb.docId)} &nbsp; <strong>Rev:</strong> ${escBOM(tb.rev)}</div>
+                        <div><strong>Date:</strong> ${escBOM(tb.date)} &nbsp; <strong>Sheet:</strong> ${escBOM(tb.sheet)}</div>
+                    </div>
+                </div>
+                ${tableHTML}
+            </body></html>`);
+            printSubWindow.document.close();
         }
 
         function importJSON(event) {
