@@ -418,6 +418,11 @@
                     </div>
 
                     <div id="pinMatrixManagerContainer"></div>
+
+                    <button class="btn" onclick="deleteSelectedEntities()" title="Delete selected element(s)"
+                        style="width:100%; margin-top:10px; background-color:#7a0000; padding:9px; font-size:12.5px; font-weight:bold;">
+                        🗑 Delete Selected
+                    </button>
                 </div>
 
                 <div class="panel-title">Title Block Fields</div>
@@ -796,6 +801,7 @@
         }
 
         function openInspector(entity, type) {
+            if (window.innerWidth <= MOBILE_BREAKPOINT) { document.getElementById('rightPropsPanel').classList.remove('collapsed'); }
             const panel = document.getElementById('inspectorSection');
             const headerTitle = document.getElementById('inspectorHeaderTitle');
             const nameGroup = document.getElementById('inspectNameGroup');
@@ -837,7 +843,7 @@
             requestRender();
         }
 
-        function closeInspector() { selectedEntities = []; document.getElementById('inspectorSection').style.display = "none"; requestRender(); }
+        function closeInspector() { selectedEntities = []; document.getElementById('inspectorSection').style.display = "none"; if (window.innerWidth <= MOBILE_BREAKPOINT) { document.getElementById('rightPropsPanel').classList.add('collapsed'); } requestRender(); }
 
         function applyInspectorChange() {
             if (selectedEntities.length !== 1) return;
@@ -847,6 +853,22 @@
             if (active.type === 'COMP') { active.entity.refDes = nameInput; active.entity.showLabel = visInput; active.entity.value = document.getElementById('inspectValueInput').value; }
             else if (active.type === 'IMG') { active.entity.refDes = nameInput; active.entity.showLabel = visInput; }
             else if (active.type === 'TEXT') { active.entity.text = nameInput; active.entity.showLabel = visInput; }
+            requestRender();
+        }
+
+        function deleteSelectedEntities() {
+            if (selectedEntities.length === 0) return;
+            selectedEntities.forEach(item => {
+                if (item.type === 'COMP') projectData.components = projectData.components.filter(c => c.id !== item.entity.id);
+                else if (item.type === 'TEXT') projectData.annotations = projectData.annotations.filter(t => t.id !== item.entity.id);
+                else if (item.type === 'SHAPE') projectData.shapes = projectData.shapes.filter(s => s.id !== item.entity.id);
+                else if (item.type === 'IMG') projectData.customImages = projectData.customImages.filter(im => im.id !== item.entity.id);
+                else if (item.type === 'WIRE') projectData.wires = projectData.wires.filter(w => w !== item.entity);
+                else if (item.type === 'PIN') projectData.customPins = projectData.customPins.filter(pin => pin !== item.entity);
+                else if (item.type === 'JUNCTION') projectData.junctions = projectData.junctions.filter(dot => dot !== item.entity);
+            });
+            selectedEntities = [];
+            closeInspector();
             requestRender();
         }
 
@@ -1661,29 +1683,7 @@
 					}
 				}
 				if (e.key === 'Delete' || e.key === 'Backspace') {
-					if (selectedEntities.length > 0) {
-						selectedEntities.forEach(item => {
-							if (item.type === 'COMP') projectData.components = projectData.components.filter(c => c.id !== item.entity.id);
-							else if (item.type === 'TEXT') projectData.annotations = projectData.annotations.filter(t => t.id !== item.entity.id);
-							else if (item.type === 'SHAPE') projectData.shapes = projectData.shapes.filter(s => s.id !== item.entity.id);
-							else if (item.type === 'IMG') projectData.customImages = projectData.customImages.filter(im => im.id !== item.entity.id);
-							else if (item.type === 'WIRE') projectData.wires = projectData.wires.filter(w => w !== item.entity); 
-							
-							// --- NEW: Filter out custom pins from your dataset ---
-							else if (item.type === 'PIN') {
-								projectData.customPins = projectData.customPins.filter(pin => pin !== item.entity);
-							}
-							// --- NEW: Filter out junction dots from your dataset ---
-							else if (item.type === 'JUNCTION') {
-								projectData.junctions = projectData.junctions.filter(dot => dot !== item.entity);
-							}
-						});
-						
-						// Clear selection array after structural items are destroyed
-						selectedEntities = [];
-						closeInspector();
-						requestRender();
-					}
+					deleteSelectedEntities();
 				}
 			});
         }

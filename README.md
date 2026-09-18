@@ -138,6 +138,10 @@ This makes projects easy to version-control, diff, or script against outside the
 - **Marquee Box** — drag across empty canvas space to sweep-select multiple parts or
   custom-drawn lines at once.
 - **Spacebar** — rotate the current selection 90°.
+- **Delete Selected** — press <kbd>Delete</kbd>/<kbd>Backspace</kbd> on desktop, or tap the
+  red **🗑 Delete Selected** button in the Element Inspector (this is the way to delete on
+  phone/touch, where there's no keyboard). Selecting any element opens the inspector
+  automatically on phone-sized screens.
 
 ## Browser Support
 
