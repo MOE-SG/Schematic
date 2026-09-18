@@ -29,26 +29,30 @@
         }
 
         header {
-            background-color: var(--panel-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 5px 15px;
+            background: linear-gradient(180deg, #2f3136 0%, #26272b 100%);
+            border-bottom: 2px solid #7a0000;
+            padding: 6px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             height: auto;
-            min-height: 45px;
+            min-height: 52px;
             flex-wrap: wrap;
             box-sizing: border-box;
             z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
         }
 
-        header h1 { font-size: 14px; margin: 0; color: var(--accent-color); }
-        
+        header h1 { font-size: 16px; margin: 0; color: #f0f0f0; letter-spacing: 0.5px; font-weight: 600; line-height: 1.1; }
+        header h1 span { color: #d64545; font-weight: 800; }
+        .brand { display: flex; flex-direction: column; justify-content: center; padding-right: 4px; }
+        .brand-sub { font-size: 9.5px; color: #8a8d93; letter-spacing: 0.3px; margin-top: 1px; white-space: nowrap; }
+
         .btn, select, input, .lib-item, .toggle-tab, .toggle-tab-left { 
             cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 2v17.2l4.8-4.8h6.8L4 2z' fill='%231b1b1b' stroke='%23ffffff' stroke-width='2.5' stroke-linejoin='miter'/%3E%3C/svg%3E"), pointer !important; 
         }
         
-        .btn { background-color: #3e3e3e; color: white; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 3px; font-size: 11px; }
+        .btn { background-color: #3e3e3e; color: white; border: 1px solid var(--border-color); padding: 5px 9px; border-radius: 4px; font-size: 11px; transition: background-color 0.12s ease; }
         .btn:hover { background-color: var(--accent-color); }
         .btn-green { background-color: #2d5a27; }
         .btn-blue { background-color: #005a9e; font-weight: bold; }
@@ -56,6 +60,29 @@
         .btn-purple { background-color: #68217a; font-weight: bold; }
         .btn-shape { background-color: #2b4b7c; font-weight: bold; }
         .separator { width: 1px; height: 16px; background-color: var(--border-color); }
+        .separator.tall { align-self: stretch; height: auto; background-color: #45464b; }
+
+        .toolbar-group { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+        .group-label { font-size: 9px; font-weight: 700; color: #8a8d93; text-transform: uppercase; letter-spacing: 0.6px; }
+        .group-row { display: flex; align-items: center; gap: 6px; }
+        .inline-label { font-size: 10.5px; color: #9a9da3; }
+
+        .status-bar {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 11px;
+            color: #aaa;
+            padding-left: 14px;
+            border-left: 1px solid #45464b;
+            white-space: nowrap;
+        }
+        .status-bar strong { color: #ffcc66; }
+        .status-bar .sheet-tag {
+            background: #7a0000; color: #fff; font-weight: 700; font-size: 10px;
+            padding: 3px 8px; border-radius: 3px; letter-spacing: 0.5px;
+        }
 
         select { background-color: #252526; color: white; border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 3px; font-size: 11px; }
 
@@ -183,38 +210,77 @@
 <body>
 
     <header>
-        <h1>WebEDA Pro Workspace</h1>
-        <button class="btn" onclick="createNewFile()">New</button>
-        <button class="btn" onclick="exportJSON()">Save Project</button>
-        <button class="btn" onclick="document.getElementById('fileInput').click()">Open Project</button>
-        <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)">
-        
-        <div class="separator"></div>
-        <button class="btn btn-green" onclick="exportAsDXF()">Export DXF</button>
-        <button class="btn btn-blue" onclick="printSchematicSheet()">🖨️ Print Sheet</button>
-        
-        <div class="separator"></div>
-        <button class="btn btn-purple" onclick="enableTextPlacementMode()">+ Add Text</button>
-        <button class="btn btn-orange" onclick="document.getElementById('imageComponentInput').click()">+ Import Symbol</button>
-        <input type="file" id="imageComponentInput" accept="image/*" style="display:none" onchange="handleUserImageUpload(event)">
+        <div class="brand">
+            <h1>WebEDA <span>PRO</span></h1>
+            <div class="brand-sub">Schematic &amp; Panel Documentation Workspace</div>
+        </div>
 
-        <div class="separator"></div>
-        <button class="btn btn-shape" onclick="setDrawingMode('DRAW_LINE')">╱ Line</button>
-        <button class="btn btn-shape" onclick="setDrawingMode('DRAW_POLYLINE')">╱╲ Polyline</button>
-        <button class="btn btn-shape" onclick="setDrawingMode('DRAW_RECT')">█ Rect</button>
-        <button class="btn btn-shape" onclick="setDrawingMode('DRAW_CIRCLE')">◯ Circle</button>
-		<button class="btn btn-shape" onclick="setDrawingMode('ADD_PIN')">Pin</button>
+        <div class="separator tall"></div>
 
-        <div class="separator"></div>
-        <label style="font-size: 11px; color: #aaa;">Grid:</label>
-        <select id="gridSizeSelect" onchange="changeGridSize(this.value)">
-            <option value="5" selected>5 px</option>
-            <option value="10">10 px</option>
-            <option value="20">20 px</option>
-        </select>
+        <div class="toolbar-group">
+            <span class="group-label">File</span>
+            <div class="group-row">
+                <button class="btn" onclick="createNewFile()" title="New drawing">📄 New</button>
+                <button class="btn" onclick="document.getElementById('fileInput').click()" title="Open project">📂 Open</button>
+                <button class="btn" onclick="exportJSON()" title="Save project">💾 Save</button>
+                <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)">
+            </div>
+        </div>
 
-        <button class="btn" onclick="resetZoomView()">🔍 Fit View</button>
-        <span style="font-size:11px; margin-left:auto; color:#aaa;">Zoom: <strong id="zoomIndicator" style="color:yellow">100%</strong> | Mode: <strong id="currentMode" style="color:cyan">SELECT</strong></span>
+        <div class="separator tall"></div>
+
+        <div class="toolbar-group">
+            <span class="group-label">Output</span>
+            <div class="group-row">
+                <button class="btn btn-green" onclick="exportAsDXF()" title="Export DXF">⇩ DXF</button>
+                <button class="btn btn-blue" onclick="printSchematicSheet()" title="Print sheet">🖨️ Print</button>
+            </div>
+        </div>
+
+        <div class="separator tall"></div>
+
+        <div class="toolbar-group">
+            <span class="group-label">Insert</span>
+            <div class="group-row">
+                <button class="btn btn-purple" onclick="enableTextPlacementMode()" title="Add text annotation">🔤 Text</button>
+                <button class="btn btn-orange" onclick="document.getElementById('imageComponentInput').click()" title="Import symbol image">🖼️ Symbol</button>
+                <input type="file" id="imageComponentInput" accept="image/*" style="display:none" onchange="handleUserImageUpload(event)">
+            </div>
+        </div>
+
+        <div class="separator tall"></div>
+
+        <div class="toolbar-group">
+            <span class="group-label">Draw</span>
+            <div class="group-row">
+                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_LINE')" title="Line">╱ Line</button>
+                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_POLYLINE')" title="Polyline">╱╲ Poly</button>
+                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_RECT')" title="Rectangle">█ Rect</button>
+                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_CIRCLE')" title="Circle">◯ Circle</button>
+                <button class="btn btn-shape" onclick="setDrawingMode('ADD_PIN')" title="Terminal pin">▪ Pin</button>
+            </div>
+        </div>
+
+        <div class="separator tall"></div>
+
+        <div class="toolbar-group">
+            <span class="group-label">View</span>
+            <div class="group-row">
+                <label class="inline-label">Grid</label>
+                <select id="gridSizeSelect" onchange="changeGridSize(this.value)">
+                    <option value="5" selected>5 px</option>
+                    <option value="10">10 px</option>
+                    <option value="20">20 px</option>
+                </select>
+                <button class="btn" onclick="resetZoomView()" title="Fit to view">🔍 Fit</button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span>Zoom: <strong id="zoomIndicator">100%</strong></span>
+            <span>Mode: <strong id="currentMode">SELECT</strong></span>
+            <span class="sheet-tag">A3 · LANDSCAPE</span>
+        </div>
     </header>
 
     <div class="main-container">
@@ -268,6 +334,10 @@
                 <div class="prop-group"><label>Date</label><input type="text" id="tbDate" value="16-JUN-2026" oninput="updateTitleBlock()"></div>
                 <div class="prop-group"><label>Revision</label><input type="text" id="tbRev" value="A" oninput="updateTitleBlock()"></div>
                 <div class="prop-group"><label>Sheet</label><input type="text" id="tbSheet" value="1/1" oninput="updateTitleBlock()"></div>
+                <div class="prop-group"><label>Sheet Size</label><input type="text" id="tbSize" value="A3" oninput="updateTitleBlock()"></div>
+                <div class="prop-group"><label>Tolerance — line 1</label><input type="text" id="tbTol1" value=".0    = ± .05" oninput="updateTitleBlock()"></div>
+                <div class="prop-group"><label>Tolerance — line 2</label><input type="text" id="tbTol2" value=".00   = ± .01" oninput="updateTitleBlock()"></div>
+                <div class="prop-group"><label>Tolerance — line 3</label><input type="text" id="tbTol3" value=".000  = ± .005" oninput="updateTitleBlock()"></div>
             </div>
         </div>
     </div>
@@ -278,7 +348,7 @@
         const viewport = document.getElementById('viewportWindow');
 
         let projectData = {
-            titleBlock: { company: "SOE MOE ENTERPRISES", docId: "D02600401", rev: "A", date: "16-JUN-2026", drawnBy: "SOE MOE", sheet: "1/1" },
+            titleBlock: { company: "SOE MOE ENTERPRISES", docId: "D02600401", rev: "A", date: "16-JUN-2026", drawnBy: "SOE MOE", sheet: "1/1", size: "A3", tol1: ".0    = ± .05", tol2: ".00   = ± .01", tol3: ".000  = ± .005" },
             components: [],
             wires: [],
             customImages: [],
@@ -879,46 +949,124 @@
             drawTitleBlock();
         }
 
+        const SHEET_RED = "#870000";
+        const TB_LABEL = "#870000";
+        const TB_VALUE = "#0000ff";
+
         function drawBordersAndZones() {
             const inchPx = 96; const offsetOuter = 15; const offsetInner = 35;
-            ctx.strokeStyle = "#a00000"; ctx.lineWidth = 2; ctx.strokeRect(offsetInner, offsetInner, canvas.width - (offsetInner * 2), canvas.height - (offsetInner * 2));
-            ctx.lineWidth = 0.75; ctx.strokeRect(offsetOuter, offsetOuter, canvas.width - (offsetOuter * 2), canvas.height - (offsetOuter * 2));
-            ctx.fillStyle = "#a00000"; ctx.font = "bold 11px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.strokeStyle = SHEET_RED; ctx.lineWidth = 2.25; ctx.strokeRect(offsetInner, offsetInner, canvas.width - (offsetInner * 2), canvas.height - (offsetInner * 2));
+            ctx.lineWidth = 0.75; ctx.strokeStyle = SHEET_RED; ctx.strokeRect(offsetOuter, offsetOuter, canvas.width - (offsetOuter * 2), canvas.height - (offsetOuter * 2));
+            ctx.fillStyle = SHEET_RED; ctx.font = "bold 11px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
 
             let colIndex = 1;
             for (let x = offsetInner; x < canvas.width - offsetInner; x += inchPx) {
                 let nextX = Math.min(x + inchPx, canvas.width - offsetInner);
                 ctx.fillText(colIndex++, x + (nextX - x) / 2, offsetOuter + 10);
+                ctx.fillText(colIndex - 1, x + (nextX - x) / 2, canvas.height - offsetOuter - 10);
                 if (nextX < canvas.width - offsetInner) {
                     ctx.beginPath(); ctx.moveTo(nextX, offsetOuter); ctx.lineTo(nextX, offsetInner); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(nextX, canvas.height - offsetOuter); ctx.lineTo(nextX, canvas.height - offsetInner); ctx.stroke();
                 }
             }
             let rowIndex = 0; const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             for (let y = offsetInner; y < canvas.height - offsetInner; y += inchPx) {
                 let nextY = Math.min(y + inchPx, canvas.height - offsetInner);
-                ctx.fillText(alphabet[rowIndex++ % alphabet.length], offsetOuter + 10, y + (nextY - y) / 2);
+                let letter = alphabet[rowIndex++ % alphabet.length];
+                ctx.fillText(letter, offsetOuter + 10, y + (nextY - y) / 2);
+                ctx.fillText(letter, canvas.width - offsetOuter - 10, y + (nextY - y) / 2);
                 if (nextY < canvas.height - offsetInner) {
                     ctx.beginPath(); ctx.moveTo(offsetOuter, nextY); ctx.lineTo(offsetInner, nextY); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(canvas.width - offsetOuter, nextY); ctx.lineTo(canvas.width - offsetInner, nextY); ctx.stroke();
                 }
             }
         }
 
+        // Layout fractions measured from the reference ASME-style title block
         function drawTitleBlock() {
-            const width = 760; const height = 80; const bx = canvas.width - 35 - width; const by = canvas.height - 35 - height;
+            const width = 760, height = 68;
+            const bx = canvas.width - 35 - width, by = canvas.height - 35 - height;
+            const tb = projectData.titleBlock;
+
+            // column boundaries (local x offsets from bx)
+            const xTolEnd   = width * 0.3316;   // end of tolerances column
+            const xRevStart = width * 0.8816;   // start of REV/Sheet column
+            const xA3End    = width * 0.4895;   // end of A3 box (within row2 only)
+            // row boundaries (local y offsets from by)
+            const yRow1End  = height * 0.3824;  // end of row1 (DocID/REV/Tol-header row)
+            const yRow2aEnd = height * 0.6618;  // end of Company/Sheet sub-row
+
+            ctx.save();
             ctx.fillStyle = "#ffffff"; ctx.fillRect(bx, by, width, height);
-            ctx.strokeStyle = "#a00000"; ctx.lineWidth = 2; ctx.strokeRect(bx, by, width, height);
-            ctx.lineWidth = 1; ctx.textAlign = "left"; ctx.textBaseline = "top";
-            
-            ctx.fillStyle = "#0000a0"; ctx.font = "bold 9px sans-serif"; ctx.fillText("COMPANY / ENTERPRISE NAME", bx + 208, by + 8);
-            ctx.fillStyle = "#000000"; ctx.font = "bold 12px Arial"; ctx.fillText(projectData.titleBlock.company.toUpperCase(), bx + 208, by + 22);
-            ctx.beginPath(); ctx.moveTo(bx + 200, by + 38); ctx.lineTo(bx + 550, by + 38); ctx.stroke();
-            ctx.fillStyle = "#0000a0"; ctx.font = "bold 9px sans-serif"; ctx.fillText("DRAWING / DOCUMENT ID", bx + 208, by + 42);
-            ctx.fillStyle = "#000000"; ctx.font = "bold 14px Courier New"; ctx.fillText(projectData.titleBlock.docId, bx + 208, by + 55);
-            ctx.strokeStyle = "#a00000"; ctx.beginPath(); ctx.moveTo(bx + 150, by); ctx.lineTo(bx + 150, by + height); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(bx + 200, by); ctx.lineTo(bx + 200, by + height); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(bx + 550, by); ctx.lineTo(bx + 550, by + height); ctx.stroke();
-            ctx.fillStyle = "#0000a0"; ctx.font = "bold 9px sans-serif"; ctx.fillText("DRAWN BY:", bx + 556, by + 8);
-            ctx.fillStyle = "#000000"; ctx.font = "11px Arial"; ctx.fillText(projectData.titleBlock.drawnBy, bx + 556, by + 22);
+            ctx.strokeStyle = SHEET_RED; ctx.lineWidth = 1.75;
+            ctx.strokeRect(bx, by, width, height);
+
+            ctx.lineWidth = 1.25; ctx.strokeStyle = SHEET_RED;
+            // tolerances/main divider — full height
+            ctx.beginPath(); ctx.moveTo(bx + xTolEnd, by); ctx.lineTo(bx + xTolEnd, by + height); ctx.stroke();
+            // REV/Sheet divider — only through row1 + row2a (Date/Drawn-By row spans full width beneath it)
+            ctx.beginPath(); ctx.moveTo(bx + xRevStart, by); ctx.lineTo(bx + xRevStart, by + yRow2aEnd); ctx.stroke();
+            // horizontal: row1 / row2 split (full width)
+            ctx.beginPath(); ctx.moveTo(bx, by + yRow1End); ctx.lineTo(bx + width, by + yRow1End); ctx.stroke();
+            // vertical: A3 / Company split (row2 only)
+            ctx.beginPath(); ctx.moveTo(bx + xA3End, by + yRow1End); ctx.lineTo(bx + xA3End, by + height); ctx.stroke();
+            // horizontal: Company / Date split (row2, col2+col3 only, full width to the right edge)
+            ctx.beginPath(); ctx.moveTo(bx + xA3End, by + yRow2aEnd); ctx.lineTo(bx + width, by + yRow2aEnd); ctx.stroke();
+
+            // --- Tolerances column ---
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 11px Arial";
+            ctx.fillText("UNSPECIFIED TOLERANCES", bx + xTolEnd / 2, by + yRow1End / 2 + 1);
+            ctx.font = "10px 'Courier New', monospace";
+            const tolLines = [tb.tol1, tb.tol2, tb.tol3];
+            const tolBandH = height - yRow1End;
+            tolLines.forEach((line, i) => {
+                const ly = by + yRow1End + tolBandH * ((i + 1) / (tolLines.length + 1));
+                ctx.fillText(line, bx + xTolEnd / 2, ly);
+            });
+
+            // --- Row1: Doc ID (spans tol-end -> rev-start) + REV ---
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 20px Arial";
+            ctx.fillText(tb.docId, bx + (xTolEnd + xRevStart) / 2, by + yRow1End / 2 + 1);
+
+            ctx.textAlign = "left";
+            ctx.fillStyle = TB_LABEL; ctx.font = "bold 10px Arial";
+            const revLabelX = bx + xRevStart + 8;
+            ctx.fillText("REV:", revLabelX, by + yRow1End / 2);
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 16px Arial";
+            ctx.fillText(tb.rev, revLabelX + 34, by + yRow1End / 2 + 1);
+
+            // --- Row2: A3 size box ---
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 16px Arial";
+            ctx.fillText(tb.size, bx + (xTolEnd + xA3End) / 2, by + yRow1End + (height - yRow1End) / 2 + 1);
+
+            // --- Row2a: Company + Sheet ---
+            ctx.textAlign = "left"; ctx.textBaseline = "middle";
+            const row2aMidY = by + yRow1End + (yRow2aEnd - yRow1End) / 2 + 1;
+            ctx.fillStyle = TB_LABEL; ctx.font = "bold 11px Arial";
+            ctx.fillText("Company:", bx + xA3End + 8, row2aMidY);
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 13px Arial";
+            ctx.fillText(tb.company, bx + xA3End + 78, row2aMidY);
+
+            ctx.fillStyle = TB_LABEL; ctx.font = "bold 10px Arial";
+            ctx.fillText("Sheet:", bx + xRevStart + 8, row2aMidY);
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 13px Arial";
+            ctx.fillText(tb.sheet, bx + xRevStart + 52, row2aMidY);
+
+            // --- Row2b: Date + Drawn By ---
+            const row2bMidY = by + yRow2aEnd + (height - yRow2aEnd) / 2 + 1;
+            ctx.fillStyle = TB_LABEL; ctx.font = "bold 10px Arial";
+            ctx.fillText("Date:", bx + xA3End + 8, row2bMidY);
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 13px Arial";
+            ctx.fillText(tb.date, bx + xA3End + 44, row2bMidY);
+            ctx.fillStyle = TB_LABEL; ctx.font = "bold 10px Arial";
+            ctx.fillText("Drawn By:", bx + xA3End + 165, row2bMidY);
+            ctx.fillStyle = TB_VALUE; ctx.font = "bold 13px Arial";
+            ctx.fillText(tb.drawnBy, bx + xA3End + 233, row2bMidY);
+
+            ctx.restore();
         }
 
         function findPinAt(mx, my) {
@@ -1358,6 +1506,10 @@
             projectData.titleBlock.company = document.getElementById('tbCompany').value; projectData.titleBlock.docId = document.getElementById('tbDocId').value;
             projectData.titleBlock.drawnBy = document.getElementById('tbDrawnBy').value; projectData.titleBlock.date = document.getElementById('tbDate').value;
             projectData.titleBlock.rev = document.getElementById('tbRev').value; projectData.titleBlock.sheet = document.getElementById('tbSheet').value;
+            projectData.titleBlock.size = document.getElementById('tbSize').value;
+            projectData.titleBlock.tol1 = document.getElementById('tbTol1').value;
+            projectData.titleBlock.tol2 = document.getElementById('tbTol2').value;
+            projectData.titleBlock.tol3 = document.getElementById('tbTol3').value;
             requestRender();
         }
 
