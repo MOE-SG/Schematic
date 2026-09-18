@@ -154,4 +154,8 @@ browsers; other browsers should honor the same CSS but may vary slightly in prin
 
 ---
 
+## License
+
+MIT License
+Copyright (c) 2026 Soe Moe
 *Built for SOE MOE ENTERPRISES.*
