@@ -21,6 +21,7 @@ inch-accurate zone references, and a fully editable engineering title block.
 - [Controls & Shortcuts](#controls--shortcuts)
 - [Browser Support](#browser-support)
 - [Known Limitations](#known-limitations)
+- [License](#license)
 
 ---
 
@@ -167,6 +168,10 @@ in print preview.
   tool, not a full EDA suite with simulation.
 - Imported symbols/footprints are raster images (PNG/JPG), not editable vector symbols.
 - Multi-sheet projects are not yet supported; each project file represents one A3 sheet.
+
+## License
+
+Licensed under the GNU General Public License v3.0 (GPL-3.0).
 
 ---
 
