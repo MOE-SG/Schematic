@@ -99,21 +99,33 @@ sheet size, and an **About** (`?`) button with a quick feature/controls summary.
 
 ## Component Library
 
-Symbols are organized into three categories in the left sidebar:
+Symbols are organized into four collapsible categories in the left sidebar. Click a
+category header (or its chevron ▼/▶) to expand or collapse it — handy for keeping
+the list short once you know which set you need. Each header also shows a live count
+of the parts inside it.
 
-**Electrical Components** — Standard Resistor, Variable Resistor, Non-Polar Capacitor,
-Polarized Capacitor, Ground (GND), Chassis Ground, Power Source (VCC), Diode, Zener
-Diode, Inductor, Transistor (NPN), Switch (SPST), Operational Amplifier.
+**Electrical Components** (28 parts) — Standard Resistor, Variable Resistor,
+Potentiometer, Non-Polar Capacitor, Polarized Capacitor, Ground (GND), Chassis
+Ground, Power Source (VCC), Battery, Diode, Zener Diode, Schottky Diode, LED, SCR
+(Thyristor), Fuse, Inductor, Crystal Oscillator, Transformer, Relay (SPST),
+Transistor (NPN), Transistor (PNP), N-Channel MOSFET, Switch (SPST), Operational
+Amplifier, Speaker/Buzzer, Antenna, Motor, Connector (2-Pin).
 
-**Flow Chart Nodes** — Terminal Block, Process Engine, Decision Branch. Useful for
-process/logic diagrams alongside or instead of electrical schematics.
+**Logic Gates** (6 parts) — AND, OR, NOT (Inverter), NAND, NOR, XOR. Standard
+MIL/ANSI-style gate outlines with input/output pins ready to wire.
 
-**Rack Systems Layout** — 19″ Full Frame Unit, 19″ Half Frame Module, Rackmount
-Computer. For enclosure/rack elevation-style layouts.
+**Flow Chart Nodes** (3 parts) — Terminal Block, Process Engine, Decision Branch.
+Useful for process/logic diagrams alongside or instead of electrical schematics.
+
+**Rack Systems Layout** (3 parts) — 19″ Full Frame Unit, 19″ Half Frame Module,
+Rackmount Computer. For enclosure/rack elevation-style layouts.
 
 Each placed part is automatically assigned the next reference designator for its
 prefix (e.g. `R1`, `R2`, `C1`, `C2` — numbering is per-prefix, so parts that share a
-prefix, like the two capacitor types, never collide).
+prefix, like the two capacitor types, never collide). Related parts intentionally
+share a prefix only when that's the real-world convention (e.g. both grounds use
+`GND`); otherwise each new part type gets its own prefix (`LED`, `DS`, `SCR`, `POT`,
+etc.) so its numbering stays independent.
 
 ## Element Inspector
 
@@ -202,4 +214,4 @@ Licensed under the GNU General Public License v3.0 (GPL-3.0).
 
 ---
 
-*Built for SOE MOE ENTERPRISES.*
+*Built for MOE's ENTERPRISE.*
