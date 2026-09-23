@@ -19,6 +19,7 @@ a fully editable engineering title block.
 - [Sheet & Title Block](#sheet--title-block)
 - [Toolbar Reference](#toolbar-reference)
 - [Component Library](#component-library)
+- [Grouping, Copy & Paste](#grouping-copy--paste)
 - [Element Inspector](#element-inspector)
 - [Bill of Materials (BOM)](#bill-of-materials-bom)
 - [File Format](#file-format)
@@ -90,6 +91,7 @@ exactly as before — you simply won't get the install prompt or offline caching
 | **File** | New, Open, Save | Start a blank sheet, load a saved `.json` project, or download the current one. |
 | **Output** | DXF, JPG, Print | Export a vector DXF, export a raster JPG snapshot, or print an exact, borderless A3 sheet. |
 | **Parts** | BOM | Open the auto-generated Bill of Materials. |
+| **Edit** | Copy, Cut, Paste, Group, Ungroup | Duplicate or move a selection, or bundle several parts so clicking any one of them selects (and moves) the whole set. See [Grouping, Copy & Paste](#grouping-copy--paste). |
 | **Insert** | Text, Symbol | Place free-form text annotations or import a raster image as a custom symbol/footprint. |
 | **Draw** | Line, Poly, Rect, Circle, Pin | Freehand drawing primitives and terminal pins, all snapped to the active grid. |
 | **View** | Grid size, Fit | Change the snap grid (5/10/20 px) or reset zoom to fit the whole sheet. |
@@ -117,8 +119,19 @@ MIL/ANSI-style gate outlines with input/output pins ready to wire.
 **Flow Chart Nodes** (3 parts) — Terminal Block, Process Engine, Decision Branch.
 Useful for process/logic diagrams alongside or instead of electrical schematics.
 
-**Rack Systems Layout** (3 parts) — 19″ Full Frame Unit, 19″ Half Frame Module,
-Rackmount Computer. For enclosure/rack elevation-style layouts.
+**Rack Systems Layout** (12 parts) — 19″ Full Frame Unit, 19″ Half Frame Module,
+Rackmount Computer, Foldable LCD/KB Drawer (1U), Half-Length PSU (Dual), Electronic
+Load Frame, Rack PDU (Horizontal), Patch Panel, Blanking Panel, UPS Unit, Cable
+Management Bar, BK9201B DC Power Supply. For enclosure/rack elevation-style layouts —
+front-panel views sized to a consistent 19″ rack width so you can stack them into a
+realistic rack elevation.
+
+**Rack unit (U) height** — every part in this category shows a small red "N U" readout
+just above its top-right corner, live-updated from its current height (1U = 25px in
+this tool's schematic scale, so a 2U part is 50px tall, 3U is 75px, and so on). The
+19″ Full Frame Unit and 19″ Half Frame Module default to 4U but are resizable — drag
+the blue handle at the bottom-right corner of a selected frame, and its height snaps
+to the nearest whole U as you drag, so the readout always lands on a clean number.
 
 Each placed part is automatically assigned the next reference designator for its
 prefix (e.g. `R1`, `R2`, `C1`, `C2` — numbering is per-prefix, so parts that share a
@@ -126,6 +139,23 @@ prefix, like the two capacitor types, never collide). Related parts intentionall
 share a prefix only when that's the real-world convention (e.g. both grounds use
 `GND`); otherwise each new part type gets its own prefix (`LED`, `DS`, `SCR`, `POT`,
 etc.) so its numbering stays independent.
+
+## Grouping, Copy & Paste
+
+- **Copy / Cut / Paste** — select one or more parts (click one, or drag a marquee box
+  around several), then use the **Edit** toolbar buttons or <kbd>Ctrl</kbd>+<kbd>C</kbd> /
+  <kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd>. Pasted copies get fresh,
+  collision-free reference designators (continuing from the highest number already in
+  use, so it's safe even after deleting parts out of sequence) and land offset from the
+  originals; pasting repeatedly cascades each copy a bit further so they don't stack
+  exactly on top of each other. Wires aren't copied — everything else (components,
+  text, custom symbol images, drawn shapes) is.
+- **Group / Ungroup** — select two or more parts and click **Group** (or
+  <kbd>Ctrl</kbd>+<kbd>G</kbd>) to bundle them: clicking any single member afterward
+  selects the whole group, so they move together as one unit. **Ungroup**
+  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>) releases the current selection back
+  into independent parts. Copying/pasting a group keeps its members grouped in the
+  pasted copy too.
 
 ## Element Inspector
 
@@ -152,6 +182,13 @@ Click **📋 BOM** in the Parts group to open a live-generated BOM:
   parts/ERP system.
 - **Print BOM** opens a clean, separate A4 print layout with its own header (company,
   document ID, revision, date, sheet).
+- **Auto-added rack accessories** — some parts automatically pull companion hardware
+  into the BOM based on how they're arranged on the sheet. Placing a **BK9201B DC
+  Power Supply** adds a matching **Rack Shelf** and **BK IT-E151 Rack Mount Kit** line:
+  one kit/shelf pair covers up to 2 units mounted side-by-side at the same height
+  (same Y position on the sheet), and units placed at a different height each get
+  their own kit/shelf. The Reference Designator column shows which supply(s) each
+  accessory belongs to (e.g. `BK1+BK2` for a shared kit, `BK3` for a standalone one).
 
 ## File Format
 
@@ -175,8 +212,20 @@ This makes projects easy to version-control, diff, or script against outside the
 - **Wires/Nets** — select a wire directly, or drag a marquee box around it and press
   <kbd>Backspace</kbd> to delete.
 - **Move Pins** — click a component, then drag any red terminal pin dot to reposition it.
+- **Move Designator Label** — click a component to select it, then drag its reference
+  designator text (e.g. `R1`, `RACK1`) to reposition it independently of the symbol — a
+  dashed box appears around the label when it's draggable. The label keeps its offset
+  when you move or rotate the component afterward.
+- **Overlapping Parts** — when parts sit on top of each other, clicking always selects
+  whichever one was placed most recently (i.e. the one drawn on top), so a part placed
+  over an existing one — like a KVM drawer over a rack frame — is the one you get.
 - **Marquee Box** — drag across empty canvas space to sweep-select multiple parts or
   custom-drawn lines at once.
+- **Copy / Cut / Paste / Group / Ungroup** — <kbd>Ctrl</kbd>+<kbd>C</kbd> /
+  <kbd>Ctrl</kbd>+<kbd>X</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> /
+  <kbd>Ctrl</kbd>+<kbd>G</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, or the
+  matching **Edit** toolbar buttons (works on phone/touch too, no keyboard needed). See
+  [Grouping, Copy & Paste](#grouping-copy--paste).
 - **Spacebar** — rotate the current selection 90°.
 - **Delete Selected** — press <kbd>Delete</kbd>/<kbd>Backspace</kbd> on desktop, or tap the
   red **🗑 Delete Selected** button in the Element Inspector (this is the way to delete on

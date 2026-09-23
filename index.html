@@ -345,6 +345,19 @@
         <div class="separator tall"></div>
 
         <div class="toolbar-group">
+            <span class="group-label">Edit</span>
+            <div class="group-row">
+                <button class="btn" onclick="copySelection()" title="Copy selection (Ctrl+C)">⧉ Copy</button>
+                <button class="btn" onclick="cutSelection()" title="Cut selection (Ctrl+X)">✂ Cut</button>
+                <button class="btn" onclick="pasteClipboard()" title="Paste (Ctrl+V)">📋 Paste</button>
+                <button class="btn" onclick="groupSelection()" title="Group selection (Ctrl+G)">⛶ Group</button>
+                <button class="btn" onclick="ungroupSelection()" title="Ungroup selection (Ctrl+Shift+G)">⛶ Ungroup</button>
+            </div>
+        </div>
+
+        <div class="separator tall"></div>
+
+        <div class="toolbar-group">
             <span class="group-label">Insert</span>
             <div class="group-row">
                 <button class="btn btn-purple" onclick="enableTextPlacementMode()" title="Add text annotation">🔤 Text</button>
@@ -930,8 +943,8 @@
                 }
             },
             {
-                name: "19\" Full Frame Unit", prefix: "RACK", type: "RK_FULL", category: "Rack Systems Layout", width: 160, height: 110, resizable: true,
-                pins: [{x:0, y:55}, {x:160, y:55}],
+                name: "19\" Full Frame Unit", prefix: "RACK", type: "RK_FULL", category: "Rack Systems Layout", width: 160, height: 100, resizable: true,
+                pins: [{x:0, y:50}, {x:160, y:50}],
                 drawVector: (ctx, w, h) => {
                     ctx.lineWidth = 3; ctx.strokeRect(2, 2, w-4, h-4); ctx.lineWidth = 1;
                     ctx.strokeRect(8, 2, 6, h-4); ctx.strokeRect(w-14, 2, 6, h-4);
@@ -939,8 +952,8 @@
                 }
             },
             {
-                name: "19\" Half Frame Module", prefix: "MOD", type: "RK_HALF", category: "Rack Systems Layout", width: 80, height: 110, resizable: true,
-                pins: [{x:0, y:55}, {x:80, y:55}],
+                name: "19\" Half Frame Module", prefix: "MOD", type: "RK_HALF", category: "Rack Systems Layout", width: 80, height: 100, resizable: true,
+                pins: [{x:0, y:50}, {x:80, y:50}],
                 drawVector: (ctx, w, h) => {
                     ctx.lineWidth = 2; ctx.strokeRect(2, 2, w-4, h-4);
                     ctx.strokeRect(6, 2, 4, h-4); ctx.strokeRect(w-10, 2, 4, h-4);
@@ -955,6 +968,104 @@
                     ctx.strokeRect(w-50, 12, 35, 8);
                     ctx.beginPath(); ctx.arc(w-45, 32, 3, 0, 2*Math.PI); ctx.fill();
                     ctx.fillRect(w-35, 30, 6, 4); ctx.fillRect(w-25, 30, 6, 4);
+                }
+            },
+            {
+                name: "Foldable LCD/KB Drawer", prefix: "KVM", type: "RK_KVM_DRAWER", category: "Rack Systems Layout", width: 160, height: 25, resizable: true,
+                pins: [{x:0, y:12}, {x:160, y:12}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    ctx.strokeRect(10, 6, 50, h-12);
+                    for (let i=70; i<w-16; i+=6) { ctx.beginPath(); ctx.moveTo(i, 8); ctx.lineTo(i, h-8); ctx.stroke(); }
+                    ctx.fillRect(3, h/2-3, 5, 6); ctx.fillRect(w-8, h/2-3, 5, 6);
+                }
+            },
+            {
+                name: "Half-Length PSU (Dual)", prefix: "PS", type: "RK_PSU_HALF", category: "Rack Systems Layout", width: 160, height: 25, resizable: true,
+                pins: [{x:0, y:12}, {x:160, y:12}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    ctx.beginPath(); ctx.moveTo(w/2, 2); ctx.lineTo(w/2, h-2); ctx.stroke();
+                    for (let i=10; i<w/2-8; i+=6) { ctx.beginPath(); ctx.moveTo(i, 6); ctx.lineTo(i, h-6); ctx.stroke(); }
+                    for (let i=w/2+8; i<w-10; i+=6) { ctx.beginPath(); ctx.moveTo(i, 6); ctx.lineTo(i, h-6); ctx.stroke(); }
+                    ctx.fillRect(w/2-7, h/2-2, 4, 4); ctx.fillRect(w-11, h/2-2, 4, 4);
+                }
+            },
+            {
+                name: "Electronic Load Frame", prefix: "EL", type: "RK_ELOAD_FRAME", category: "Rack Systems Layout", width: 160, height: 75, resizable: true,
+                pins: [{x:0, y:37}, {x:160, y:37}],
+                drawVector: (ctx, w, h) => {
+                    ctx.lineWidth = 2; ctx.strokeRect(2, 2, w-4, h-4); ctx.lineWidth = 1;
+                    ctx.strokeRect(6, 6, w-12, 18);
+                    ctx.font = "8px Arial"; ctx.fillText("0.000 A  0.00 V", 10, 18);
+                    const bayW = (w-16) / 4;
+                    for (let i=0; i<4; i++) {
+                        const bx = 8 + i*bayW;
+                        ctx.strokeRect(bx, 28, bayW-4, h-34);
+                        ctx.strokeRect(bx+4, 32, bayW-12, 8);
+                        ctx.beginPath(); ctx.arc(bx+bayW/2-4, h-10, 3, 0, 2*Math.PI); ctx.arc(bx+bayW/2+4, h-10, 3, 0, 2*Math.PI); ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Rack PDU (Horizontal)", prefix: "PDU", type: "RK_PDU", category: "Rack Systems Layout", width: 160, height: 20, resizable: true,
+                pins: [{x:0, y:10}, {x:160, y:10}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    for (let i=14; i<w-10; i+=14) {
+                        ctx.beginPath(); ctx.arc(i, h/2, 4, 0, 2*Math.PI); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(i-2, h/2); ctx.lineTo(i+2, h/2); ctx.moveTo(i, h/2-2); ctx.lineTo(i, h/2+2); ctx.stroke();
+                    }
+                }
+            },
+            {
+                name: "Patch Panel", prefix: "PP", type: "RK_PATCH", category: "Rack Systems Layout", width: 160, height: 25, resizable: true,
+                pins: [{x:0, y:12}, {x:160, y:12}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    for (let i=8; i<w-10; i+=12) { ctx.strokeRect(i, 7, 8, h-14); }
+                }
+            },
+            {
+                name: "Blanking Panel", prefix: "BLK", type: "RK_BLANK", category: "Rack Systems Layout", width: 160, height: 25, resizable: true,
+                pins: [{x:0, y:12}, {x:160, y:12}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    ctx.save(); ctx.beginPath(); ctx.rect(3, 3, w-6, h-6); ctx.clip();
+                    for (let i=0; i<w+h; i+=10) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i-h, h); ctx.stroke(); }
+                    ctx.restore();
+                }
+            },
+            {
+                name: "UPS Unit", prefix: "UPS", type: "RK_UPS", category: "Rack Systems Layout", width: 160, height: 50, resizable: true,
+                pins: [{x:0, y:25}, {x:160, y:25}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    ctx.strokeRect(10, 10, 44, h-20);
+                    ctx.font = "8px Arial"; ctx.fillText("UPS", 18, h/2+3);
+                    for (let i=w-50; i<w-10; i+=8) { ctx.beginPath(); ctx.moveTo(i, 8); ctx.lineTo(i, h-8); ctx.stroke(); }
+                }
+            },
+            {
+                name: "Cable Management Bar", prefix: "CM", type: "RK_CABLEMGMT", category: "Rack Systems Layout", width: 160, height: 15, resizable: true,
+                pins: [{x:0, y:7}, {x:160, y:7}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    for (let i=20; i<w-10; i+=30) { ctx.beginPath(); ctx.arc(i, h/2, 4, 0, 2*Math.PI); ctx.stroke(); }
+                }
+            },
+            {
+                name: "BK9201B DC Power Supply", prefix: "BK", type: "BK9201B", category: "Rack Systems Layout", width: 80, height: 50, resizable: true,
+                pins: [{x:0, y:25}, {x:80, y:25}],
+                drawVector: (ctx, w, h) => {
+                    ctx.strokeRect(2, 2, w-4, h-4);
+                    ctx.strokeRect(6, 8, 28, 16);
+                    ctx.font = "6px Arial"; ctx.fillText("0.00V 0.00A", 7, 18);
+                    ctx.beginPath(); ctx.arc(42, 16, 5, 0, 2*Math.PI); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(56, 16, 5, 0, 2*Math.PI); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(10, 38, 3, 0, 2*Math.PI); ctx.arc(20, 38, 3, 0, 2*Math.PI); ctx.arc(30, 38, 3, 0, 2*Math.PI); ctx.stroke();
+                    ctx.font = "6px Arial"; ctx.fillText("+", 8, 46); ctx.fillText("-", 18, 46); ctx.fillText("G", 27, 46);
+                    for (let i=46; i<w-6; i+=5) { ctx.beginPath(); ctx.moveTo(i, 30); ctx.lineTo(i, h-8); ctx.stroke(); }
                 }
             }
         ];
@@ -972,6 +1083,9 @@
         
         let isResizing = false; let resizeTargetEntity = null;
         let isDraggingPin = false; let dragPinEntity = null; let dragPinType = null; let dragPinIndex = -1;
+        let isDraggingLabel = false; let dragLabelEntity = null; let dragLabelClickOffset = { x: 0, y: 0 };
+        let clipboard = []; let pasteGeneration = 0;
+        const RACK_U_PX = 25; // px per rack U, matches the 1U/2U/3U sizing used by the Rack Systems Layout parts
 
         let draggedEntities = []; let initialMouseModelPos = { x: 0, y: 0 };
         let activePolylinePoints = []; let renderRequested = false; let shapeDraftStart = null;
@@ -1083,11 +1197,42 @@
 
         function isPointInComponent(mx, my, comp) {
             let cx = comp.x + comp.width / 2; let cy = comp.y + comp.height / 2;
-            let rad = -((comp.rotation || 0) * Math.PI) / 180; 
+            let rad = -((comp.rotation || 0) * Math.PI) / 180;
             let dx = mx - cx; let dy = my - cy;
             let localX = dx * Math.cos(rad) - dy * Math.sin(rad) + comp.width / 2;
             let localY = dx * Math.sin(rad) + dy * Math.cos(rad) + comp.height / 2;
             return localX >= 0 && localX <= comp.width && localY >= 0 && localY <= comp.height;
+        }
+
+        // Converts an absolute model-space point into a component's own local (unrotated,
+        // top-left-origin) coordinate space. Used for both body hit-testing and for
+        // positioning/dragging the reference-designator label.
+        function modelPointToComponentLocal(mx, my, comp) {
+            let cx = comp.x + comp.width / 2; let cy = comp.y + comp.height / 2;
+            let rad = -((comp.rotation || 0) * Math.PI) / 180;
+            let dx = mx - cx; let dy = my - cy;
+            return {
+                x: dx * Math.cos(rad) - dy * Math.sin(rad) + comp.width / 2,
+                y: dx * Math.sin(rad) + dy * Math.cos(rad) + comp.height / 2
+            };
+        }
+
+        // The label's local bounding box, anchored at its (draggable) offset from the
+        // component's top-left corner. fillText anchors bottom-left, so the box extends
+        // right and up from (labelDX, labelDY).
+        function getLabelLocalBounds(comp) {
+            const dx = comp.labelDX ?? 0; const dy = comp.labelDY ?? -6;
+            const text = `${comp.refDes ?? ""}`;
+            const textW = Math.max(text.length * 6.5 + 4, 14);
+            const textH = 13;
+            return { x: dx - 2, y: dy - textH, w: textW, h: textH + 4, dx, dy };
+        }
+
+        function isPointNearLabel(mx, my, comp) {
+            if (comp.showLabel === false) return false;
+            const local = modelPointToComponentLocal(mx, my, comp);
+            const b = getLabelLocalBounds(comp);
+            return local.x >= b.x && local.x <= b.x + b.w && local.y >= b.y && local.y <= b.y + b.h;
         }
 
         function openInspector(entity, type) {
@@ -1146,6 +1291,20 @@
             requestRender();
         }
 
+        // Next free number for a given reference-designator prefix. Uses the highest
+        // existing number + 1 (not a plain count) so that deleting/cutting a part out of
+        // sequence — then placing or pasting a new one — can never reissue a designator
+        // that's still in use (e.g. R1,R2,R3 minus R1, then a new part, correctly gets R4).
+        function nextRefDesNumber(prefix) {
+            let maxNum = 0;
+            projectData.components.forEach(c => {
+                if (c.prefix !== prefix) return;
+                const m = /(\d+)\s*$/.exec(c.refDes || "");
+                if (m) maxNum = Math.max(maxNum, parseInt(m[1], 10));
+            });
+            return maxNum + 1;
+        }
+
         function deleteSelectedEntities() {
             if (selectedEntities.length === 0) return;
             selectedEntities.forEach(item => {
@@ -1159,6 +1318,125 @@
             });
             selectedEntities = [];
             closeInspector();
+            requestRender();
+        }
+
+        // ---------- Grouping ----------
+        // A group is just a shared `groupId` string stamped onto each member entity.
+        // Clicking any one member in SELECT mode re-selects the whole group (see the
+        // click handler), so grouped parts move, copy and delete together.
+        function groupSelection() {
+            if (selectedEntities.length < 2) return;
+            const groupId = "GRP_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+            selectedEntities.forEach(item => {
+                if (['COMP', 'IMG', 'TEXT', 'SHAPE'].includes(item.type)) item.entity.groupId = groupId;
+            });
+            requestRender();
+        }
+
+        function ungroupSelection() {
+            if (selectedEntities.length === 0) return;
+            selectedEntities.forEach(item => { delete item.entity.groupId; });
+            requestRender();
+        }
+
+        function selectGroupMembers(groupId) {
+            const members = [];
+            projectData.components.forEach(c => { if (c.groupId === groupId) members.push({ entity: c, type: 'COMP' }); });
+            projectData.customImages.forEach(im => { if (im.groupId === groupId) members.push({ entity: im, type: 'IMG' }); });
+            projectData.annotations.forEach(t => { if (t.groupId === groupId) members.push({ entity: t, type: 'TEXT' }); });
+            projectData.shapes.forEach(s => { if (s.groupId === groupId) members.push({ entity: s, type: 'SHAPE' }); });
+            return members;
+        }
+
+        // ---------- Copy / Cut / Paste ----------
+        // Clones preserve everything (including a COMP's drawVector function reference,
+        // which a JSON round-trip would silently drop) via a shallow spread plus a deep
+        // copy of any nested arrays (pins/points) that must not be shared with the original.
+        function cloneEntityForClipboard(entity, type) {
+            if (type === 'SHAPE' && entity.type === 'DRAW_POLYLINE') {
+                return { ...entity, points: (entity.points || []).map(p => ({ ...p })) };
+            }
+            return { ...entity, pins: entity.pins ? entity.pins.map(p => ({ ...p })) : entity.pins };
+        }
+
+        function copySelection() {
+            const copyable = selectedEntities.filter(item => ['COMP', 'IMG', 'TEXT', 'SHAPE'].includes(item.type));
+            if (!copyable.length) return;
+            clipboard = copyable.map(item => ({ type: item.type, entity: cloneEntityForClipboard(item.entity, item.type) }));
+            pasteGeneration = 0;
+        }
+
+        function cutSelection() {
+            if (!selectedEntities.some(item => ['COMP', 'IMG', 'TEXT', 'SHAPE'].includes(item.type))) return;
+            copySelection();
+            deleteSelectedEntities();
+        }
+
+        function nextImageRefDesNumber() {
+            let maxNum = 0;
+            projectData.customImages.forEach(im => {
+                const m = /(\d+)\s*$/.exec(im.refDes || "");
+                if (m) maxNum = Math.max(maxNum, parseInt(m[1], 10));
+            });
+            return maxNum + 1;
+        }
+
+        function pasteClipboard() {
+            if (!clipboard.length) return;
+            pasteGeneration++;
+            const offset = 20 * pasteGeneration;
+            const groupIdMap = {};
+            const newSelection = [];
+
+            clipboard.forEach(clip => {
+                let newEntity = cloneEntityForClipboard(clip.entity, clip.type);
+
+                if (clip.entity.groupId) {
+                    if (!groupIdMap[clip.entity.groupId]) groupIdMap[clip.entity.groupId] = "GRP_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                    newEntity.groupId = groupIdMap[clip.entity.groupId];
+                } else {
+                    delete newEntity.groupId;
+                }
+
+                if (clip.type === 'COMP') {
+                    newEntity.id = Date.now() + Math.random();
+                    // Recomputed fresh (not cached) each time, so a paste that includes
+                    // several parts sharing a prefix still numbers them 1-apart correctly,
+                    // since each previous paste in this loop is already pushed by the time
+                    // the next one is numbered.
+                    newEntity.refDes = `${newEntity.prefix}${nextRefDesNumber(newEntity.prefix)}`;
+                    newEntity.x = snapToGrid(clip.entity.x + offset);
+                    newEntity.y = snapToGrid(clip.entity.y + offset);
+                    projectData.components.push(newEntity);
+                } else if (clip.type === 'IMG') {
+                    newEntity.id = "IMG_" + Date.now() + Math.floor(Math.random() * 1000);
+                    newEntity.refDes = `IMG${nextImageRefDesNumber()}`;
+                    newEntity.x = snapToGrid(clip.entity.x + offset);
+                    newEntity.y = snapToGrid(clip.entity.y + offset);
+                    projectData.customImages.push(newEntity);
+                } else if (clip.type === 'TEXT') {
+                    newEntity.id = "TXT_" + Date.now() + Math.floor(Math.random() * 1000);
+                    newEntity.x = snapToGrid(clip.entity.x + offset);
+                    newEntity.y = snapToGrid(clip.entity.y + offset);
+                    projectData.annotations.push(newEntity);
+                } else if (clip.type === 'SHAPE') {
+                    newEntity.id = "SHP_" + Date.now() + Math.floor(Math.random() * 1000);
+                    if (newEntity.type === 'DRAW_POLYLINE') {
+                        newEntity.points = newEntity.points.map(p => ({ x: snapToGrid(p.x + offset), y: snapToGrid(p.y + offset) }));
+                    } else {
+                        newEntity.x1 = snapToGrid(clip.entity.x1 + offset); newEntity.y1 = snapToGrid(clip.entity.y1 + offset);
+                        newEntity.x2 = snapToGrid(clip.entity.x2 + offset); newEntity.y2 = snapToGrid(clip.entity.y2 + offset);
+                    }
+                    projectData.shapes.push(newEntity);
+                }
+
+                newSelection.push({ entity: newEntity, type: clip.type });
+            });
+
+            selectedEntities = newSelection;
+            if (selectedEntities.length === 1) openInspector(selectedEntities[0].entity, selectedEntities[0].type);
+            else if (selectedEntities.length > 1) openInspector(selectedEntities[0].entity, 'GROUP');
             requestRender();
         }
 
@@ -1223,7 +1501,7 @@
                         id: "IMG_" + Date.now(), src: e.target.result, imgElement: img, type: "IMG", resizable: true,
                         x: snapToGrid(150), y: snapToGrid(150), color: globalSelectedColor,
                         width: snapToGrid(displayWidth), height: snapToGrid(displayHeight),
-                        refDes: "IMG1", showLabel: true,
+                        refDes: `IMG${nextImageRefDesNumber()}`, showLabel: true,
                         pins: [{ x: 0, y: Math.round(displayHeight/2) }, { x: Math.round(displayWidth), y: Math.round(displayHeight/2) }]
                     };
                     projectData.customImages.push(newCustomSymbol);
@@ -1410,10 +1688,29 @@
                 ctx.translate(-comp.width / 2, -comp.height / 2);
                 
                 if (comp.drawVector) comp.drawVector(ctx, comp.width, comp.height);
-                
+
+                // Live rack-unit (U) readout for anything in the Rack Systems Layout category,
+                // so the height of a resizable frame (e.g. the 19" Full Frame Unit) is always
+                // readable at a glance instead of having to guess from the pixel size. Drawn
+                // just outside the top-right corner (mirroring the refDes label's default
+                // top-left spot) so it never overlaps the symbol's own artwork.
+                if (comp.category === "Rack Systems Layout") {
+                    ctx.save();
+                    ctx.translate(comp.width, -6); ctx.rotate((-rotDeg * Math.PI) / 180);
+                    ctx.font = "bold 9px Arial"; ctx.fillStyle = "#a00000"; ctx.textAlign = "right";
+                    ctx.fillText(`${Math.round(comp.height / RACK_U_PX)}U`, 0, 0);
+                    ctx.restore();
+                }
+
                 if (comp.showLabel !== false) {
-                    ctx.save(); ctx.translate(0, -6); ctx.rotate((-rotDeg * Math.PI) / 180); ctx.font = "bold 11px Courier New";
-                    ctx.fillText(`${comp.refDes}`, 0, 0); ctx.restore();
+                    ctx.save(); ctx.translate(comp.labelDX ?? 0, comp.labelDY ?? -6); ctx.rotate((-rotDeg * Math.PI) / 180); ctx.font = "bold 11px Courier New";
+                    ctx.fillText(`${comp.refDes}`, 0, 0);
+                    if (isEntitySelected(comp)) {
+                        const b = getLabelLocalBounds(comp);
+                        ctx.strokeStyle = "#007acc"; ctx.lineWidth = 1; ctx.setLineDash([2, 2]);
+                        ctx.strokeRect(b.x - (comp.labelDX ?? 0), b.y - (comp.labelDY ?? -6), b.w, b.h);
+                    }
+                    ctx.restore();
                 }
                 
                 if (isEntitySelected(comp)) {
@@ -1610,7 +1907,7 @@
 
         function dropActiveTools() {
             if (currentMode === 'DRAW_POLYLINE') { bakePolylinePath(); return; }
-            activeWirePoints = []; shapeDraftStart = null; isMarqueeSelecting = false; isResizing = false; isDraggingPin = false;
+            activeWirePoints = []; shapeDraftStart = null; isMarqueeSelecting = false; isResizing = false; isDraggingPin = false; isDraggingLabel = false; dragLabelEntity = null;
             selectedEntities = []; setMode('SELECT'); closeInspector();
         }
 
@@ -1646,6 +1943,17 @@
 									return;
 								}
 							}
+						}
+					}
+					// Designator label drag handle — only checked once the component is already
+					// selected, same click-then-drag pattern as pin dragging above.
+					if (activeItem.type === 'COMP') {
+						let ent = activeItem.entity;
+						if (isPointNearLabel(modelPos.x, modelPos.y, ent)) {
+							const local = modelPointToComponentLocal(modelPos.x, modelPos.y, ent);
+							isDraggingLabel = true; dragLabelEntity = ent;
+							dragLabelClickOffset = { x: local.x - (ent.labelDX ?? 0), y: local.y - (ent.labelDY ?? -6) };
+							return;
 						}
 					}
 				}
@@ -1750,9 +2058,9 @@
 				}
 
 				if (currentMode === 'PLACE' && selectedLibraryPart) {
-					const count = projectData.components.filter(c => c.prefix === selectedLibraryPart.prefix).length + 1;
-					let newPart = { 
-						...selectedLibraryPart, id: Date.now(), x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y), 
+					const count = nextRefDesNumber(selectedLibraryPart.prefix);
+					let newPart = {
+						...selectedLibraryPart, id: Date.now(), x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y),
 						refDes: `${selectedLibraryPart.prefix}${count}`, value: "", showLabel: true, color: globalSelectedColor, rotation: 0,
 						pins: selectedLibraryPart.pins.map(p => ({...p}))
 					};
@@ -1792,16 +2100,19 @@
 					}
 
 					// --- Priority 3: Fallback to existing structural component/wire items ---
-					let compFound = projectData.components.find(c => isPointInComponent(modelPos.x, modelPos.y, c));
+					// Search each array back-to-front so a part placed later (drawn on top,
+					// e.g. a KVM drawer placed over a rack frame) is picked over one drawn
+					// underneath it, instead of always matching whichever was placed first.
+					let compFound = [...projectData.components].reverse().find(c => isPointInComponent(modelPos.x, modelPos.y, c));
 					if (compFound) { foundItem = compFound; foundType = 'COMP'; }
 
 					if (!foundItem) {
-						let imgFound = projectData.customImages.find(img => modelPos.x >= img.x && modelPos.x <= img.x + img.width && modelPos.y >= img.y && modelPos.y <= img.y + img.height);
+						let imgFound = [...projectData.customImages].reverse().find(img => modelPos.x >= img.x && modelPos.x <= img.x + img.width && modelPos.y >= img.y && modelPos.y <= img.y + img.height);
 						if (imgFound) { foundItem = imgFound; foundType = 'IMG'; }
 					}
 
 					if (!foundItem) {
-						let txtFound = projectData.annotations.find(node => {
+						let txtFound = [...projectData.annotations].reverse().find(node => {
 							let widthEst = node.text.length * 8;
 							return modelPos.x >= node.x - 4 && modelPos.x <= node.x + widthEst && modelPos.y >= node.y - 14 && modelPos.y <= node.y + 4;
 						});
@@ -1809,7 +2120,7 @@
 					}
 
 					if (!foundItem) {
-						let shapeFound = projectData.shapes.find(s => {
+						let shapeFound = [...projectData.shapes].reverse().find(s => {
 							if (s.type === 'DRAW_POLYLINE') {
 								if (!s.points || s.points.length < 2) return false;
 								for (let i = 0; i < s.points.length - 1; i++) {
@@ -1826,12 +2137,19 @@
 					}
 
 					if (!foundItem) {
-						let wireFound = projectData.wires.find(w => isPointNearLine(modelPos.x, modelPos.y, w.x1, w.y1, w.x2, w.y2));
+						let wireFound = [...projectData.wires].reverse().find(w => isPointNearLine(modelPos.x, modelPos.y, w.x1, w.y1, w.x2, w.y2));
 						if (wireFound) { foundItem = wireFound; foundType = 'WIRE'; }
 					}
 
 					if (foundItem) {
-						selectedEntities = [{ entity: foundItem, type: foundType }]; openInspector(foundItem, foundType);
+						// Clicking any member of a group selects the whole group, so it
+						// moves/copies/deletes together.
+						if (foundItem.groupId) {
+							selectedEntities = selectGroupMembers(foundItem.groupId);
+							openInspector(selectedEntities[0].entity, selectedEntities.length > 1 ? 'GROUP' : foundType);
+						} else {
+							selectedEntities = [{ entity: foundItem, type: foundType }]; openInspector(foundItem, foundType);
+						}
 						isDraggingEntity = true; initialMouseModelPos = { x: modelPos.x, y: modelPos.y };
 						draggedEntities = selectedEntities.map(item => {
 							if (item.type === 'SHAPE' && item.entity.type === 'DRAW_POLYLINE') {
@@ -1881,11 +2199,23 @@
                     requestRender(); return;
                 }
 
+                if (isDraggingLabel && dragLabelEntity) {
+                    const local = modelPointToComponentLocal(modelPos.x, modelPos.y, dragLabelEntity);
+                    dragLabelEntity.labelDX = snapToGrid(local.x - dragLabelClickOffset.x);
+                    dragLabelEntity.labelDY = snapToGrid(local.y - dragLabelClickOffset.y);
+                    requestRender(); return;
+                }
+
                 if (isResizing && resizeTargetEntity) {
                     let calculatedWidth = snapToGrid(modelPos.x - resizeTargetEntity.x);
                     let calculatedHeight = snapToGrid(modelPos.y - resizeTargetEntity.y);
+                    // Rack Systems Layout parts snap to whole rack-U increments while resizing,
+                    // so the height always lands on a clean, readable U count.
+                    if (resizeTargetEntity.category === "Rack Systems Layout") {
+                        calculatedHeight = Math.round(calculatedHeight / RACK_U_PX) * RACK_U_PX;
+                    }
                     resizeTargetEntity.width = Math.max(calculatedWidth, 20);
-                    resizeTargetEntity.height = Math.max(calculatedHeight, 20);
+                    resizeTargetEntity.height = Math.max(calculatedHeight, RACK_U_PX);
                     requestRender(); return;
                 }
 
@@ -1959,21 +2289,33 @@
                     else if (selectedEntities.length > 1) openInspector(selectedEntities[0].entity, 'GROUP');
                 }
                 isMarqueeSelecting = false; isDraggingEntity = false; isPanningView = false; isResizing = false; isDraggingPin = false;
+                isDraggingLabel = false; dragLabelEntity = null;
                 requestRender();
             });
 
 			 window.addEventListener('keydown', (e) => {
+				// Don't hijack normal typing/editing shortcuts inside text inputs (title
+				// block fields, etc.) — let the browser's native behavior handle those.
+				const inField = e.target && ['INPUT', 'TEXTAREA'].includes(e.target.tagName);
+
 				if (e.key === 'Escape') { dropActiveTools(); requestRender(); }
-				if (e.key === ' ' || e.code === 'Space') {
+				if (!inField && (e.key === ' ' || e.code === 'Space')) {
 					let containsComp = selectedEntities.some(item => item.type === 'COMP');
 					if (containsComp) {
-						e.preventDefault(); 
+						e.preventDefault();
 						selectedEntities.forEach(item => { if (item.type === 'COMP') item.entity.rotation = ((item.entity.rotation || 0) + 90) % 360; });
 						requestRender();
 					}
 				}
-				if (e.key === 'Delete' || e.key === 'Backspace') {
+				if (!inField && (e.key === 'Delete' || e.key === 'Backspace')) {
 					deleteSelectedEntities();
+				}
+				if (!inField && (e.ctrlKey || e.metaKey)) {
+					const key = e.key.toLowerCase();
+					if (key === 'c') { copySelection(); e.preventDefault(); }
+					else if (key === 'x') { cutSelection(); e.preventDefault(); }
+					else if (key === 'v') { pasteClipboard(); e.preventDefault(); }
+					else if (key === 'g') { e.preventDefault(); if (e.shiftKey) ungroupSelection(); else groupSelection(); }
 				}
 			});
         }
@@ -2118,6 +2460,57 @@
         // ---------- Bill of Materials ----------
         function escBOM(s) { return (s === undefined || s === null) ? "" : String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
+        // Parts whose presence on the sheet auto-adds companion rack accessories to the BOM.
+        // Each accessory group is derived from how many of the part share the same rack "row"
+        // (Y position, within rowTolerance px) — mirroring how the physical kit is ordered:
+        // one kit/shelf covers up to maxPerGroup units mounted side-by-side at the same height,
+        // and units at a different height each need their own kit/shelf.
+        const BOM_AUTO_ACCESSORIES = {
+            "BK9201B": {
+                maxPerGroup: 2,
+                rowTolerance: 15,
+                accessories: [
+                    { name: "Rack Shelf (for BK9201B)", category: "Rack Accessory", value: "3U shelf" },
+                    { name: "BK IT-E151 Rack Mount Kit", category: "Rack Accessory", value: "3U, holds up to 2 side-by-side" }
+                ]
+            }
+        };
+
+        function generateAutoAccessoryRows() {
+            const accessoryRows = [];
+            Object.keys(BOM_AUTO_ACCESSORIES).forEach(type => {
+                const rule = BOM_AUTO_ACCESSORIES[type];
+                const parts = projectData.components.filter(c => c.type === type);
+                if (!parts.length) return;
+
+                // Cluster by Y position (same rack row = same shelf height) within tolerance.
+                const rowGroups = [];
+                parts.slice().sort((a, b) => a.y - b.y || a.x - b.x).forEach(c => {
+                    let g = rowGroups.find(g => Math.abs(g.y - c.y) <= rule.rowTolerance);
+                    if (!g) { g = { y: c.y, items: [] }; rowGroups.push(g); }
+                    g.items.push(c);
+                });
+
+                // Within each row, chunk into groups of up to maxPerGroup (side-by-side units
+                // sharing one kit); a row with more units than that needs multiple kits.
+                const unitGroups = [];
+                rowGroups.forEach(g => {
+                    for (let i = 0; i < g.items.length; i += rule.maxPerGroup) {
+                        unitGroups.push(g.items.slice(i, i + rule.maxPerGroup));
+                    }
+                });
+
+                rule.accessories.forEach(acc => {
+                    const refDes = unitGroups.map(grp => grp.map(c => c.refDes || "?").join("+"));
+                    accessoryRows.push({
+                        name: acc.name, category: acc.category, value: acc.value,
+                        refDes: refDes, qty: unitGroups.length
+                    });
+                });
+            });
+            return accessoryRows;
+        }
+
         function generateBOMData() {
             const groups = {};
             projectData.components.forEach(comp => {
@@ -2131,6 +2524,7 @@
             const rows = Object.values(groups);
             // Natural sort of ref-designators within a group (R1, R2, R10 ... not R1, R10, R2)
             rows.forEach(r => r.refDes.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+            rows.push(...generateAutoAccessoryRows());
             rows.sort((a, b) => a.name.localeCompare(b.name) || a.value.localeCompare(b.value));
             return rows;
         }
