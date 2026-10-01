@@ -17,10 +17,10 @@
 
     <style>
         :root {
-            --bg-color: #1e1e1e;
-            --panel-color: #2d2d2d;
-            --border-color: #444;
-            --text-color: #e0e0e0;
+            --bg-color: #f0f0f0;
+            --panel-color: #e6e6e6;
+            --border-color: #c7c7c7;
+            --text-color: #1a1a1a;
             --accent-color: #007acc;
         }
 
@@ -40,7 +40,7 @@
         }
 
         header {
-            background: linear-gradient(180deg, #2f3136 0%, #26272b 100%);
+            background: linear-gradient(180deg, #f7f7f7 0%, #ebebeb 100%);
             border-bottom: 2px solid #7a0000;
             padding: 6px 16px;
             display: flex;
@@ -51,32 +51,71 @@
             flex-wrap: wrap;
             box-sizing: border-box;
             z-index: 10;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
 
-        header h1 { font-size: 16px; margin: 0; color: #f0f0f0; letter-spacing: 0.5px; font-weight: 600; line-height: 1.1; }
-        header h1 span { color: #d64545; font-weight: 800; }
+        header h1 { font-size: 16px; margin: 0; color: #1a1a1a; letter-spacing: 0.5px; font-weight: 600; line-height: 1.1; }
+        header h1 span { color: #a02020; font-weight: 800; }
         .brand { display: flex; flex-direction: column; justify-content: center; padding-right: 4px; }
-        .brand-sub { font-size: 9.5px; color: #8a8d93; letter-spacing: 0.3px; margin-top: 1px; white-space: nowrap; }
+        .brand-sub { font-size: 9.5px; color: #6b6e73; letter-spacing: 0.3px; margin-top: 1px; white-space: nowrap; }
 
         .btn, select, input, .lib-item, .toggle-tab, .toggle-tab-left { 
             cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 2v17.2l4.8-4.8h6.8L4 2z' fill='%231b1b1b' stroke='%23ffffff' stroke-width='2.5' stroke-linejoin='miter'/%3E%3C/svg%3E"), pointer !important; 
         }
         
-        .btn { background-color: #3e3e3e; color: white; border: 1px solid var(--border-color); padding: 5px 9px; border-radius: 4px; font-size: 11px; transition: background-color 0.12s ease; }
-        .btn:hover { background-color: var(--accent-color); }
-        .btn-green { background-color: #2d5a27; }
-        .btn-blue { background-color: #005a9e; font-weight: bold; }
-        .btn-orange { background-color: #d87c16; }
-        .btn-purple { background-color: #68217a; font-weight: bold; }
-        .btn-shape { background-color: #2b4b7c; font-weight: bold; }
+        .btn { background-color: #e4e4e4; color: #1a1a1a; border: 1px solid var(--border-color); padding: 5px 9px; border-radius: 4px; font-size: 11px; transition: background-color 0.12s ease; }
+        .btn:hover { background-color: var(--accent-color); color: #fff; }
+        .btn-green { background-color: #3f8f3a; color: #fff; }
+        .btn-blue { background-color: #0d6fb8; color: #fff; font-weight: bold; }
+        .btn-orange { background-color: #d87c16; color: #fff; }
+        .btn-purple { background-color: #7a3690; color: #fff; font-weight: bold; }
+        .btn-shape { background-color: #2b4b7c; color: #fff; font-weight: bold; }
         .separator { width: 1px; height: 16px; background-color: var(--border-color); }
-        .separator.tall { align-self: stretch; height: auto; background-color: #45464b; }
+        .separator.tall { align-self: stretch; height: auto; background-color: #d0d0d0; }
 
-        .toolbar-group { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
-        .group-label { font-size: 9px; font-weight: 700; color: #8a8d93; text-transform: uppercase; letter-spacing: 0.6px; }
-        .group-row { display: flex; align-items: center; gap: 6px; }
-        .inline-label { font-size: 10.5px; color: #9a9da3; }
+        /* ===================== Menu tree (header dropdown menus) ===================== */
+        .menu-top { position: relative; }
+        .menu-top-btn { display: flex; align-items: center; gap: 3px; }
+        .menu-top-btn .caret { font-size: 8px; opacity: 0.7; }
+        .menu-top.open .menu-top-btn { background-color: var(--accent-color); }
+        .menu-dropdown {
+            display: none; flex-direction: column; gap: 1px;
+            position: absolute; top: calc(100% + 4px); left: 0;
+            background: #ffffff; border: 1px solid var(--border-color); border-radius: 5px;
+            min-width: 200px; z-index: 90; padding: 4px; box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+        .menu-top.open .menu-dropdown { display: flex; }
+        .menu-item {
+            display: flex; align-items: center; gap: 8px; width: 100%;
+            text-align: left; justify-content: flex-start; border: 1px solid transparent;
+            background: transparent; white-space: nowrap;
+        }
+        .menu-item:hover { background-color: var(--accent-color); color: #fff; }
+        .menu-item .menu-item-icon { width: 18px; text-align: center; flex-shrink: 0; }
+        .menu-item .menu-item-check { margin-left: auto; opacity: 0.85; }
+        .menu-sep { height: 1px; background: #d8d8d8; margin: 4px 2px; }
+
+        /* Right-click / long-press context menu — built from the same MENU_TREE as
+           the header, so every command is reachable both ways. */
+        .context-menu {
+            display: none; flex-direction: column; gap: 1px;
+            position: fixed; z-index: 200;
+            background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px;
+            min-width: 210px; max-height: 80vh; overflow-y: auto;
+            padding: 4px; box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+        }
+        .context-menu.open { display: flex; }
+        .context-menu-group-header {
+            display: flex; align-items: center; gap: 6px; width: 100%;
+            background: transparent; border: none; color: var(--text-color);
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+            padding: 7px 8px; text-align: left; border-radius: 4px;
+        }
+        .context-menu-group-header:hover { background-color: #e6e6e6; }
+        .context-menu-group-header { cursor: pointer; }
+        .context-menu-chevron { font-size: 9px; width: 10px; color: #888; }
+        .context-menu-group-body { display: flex; flex-direction: column; gap: 1px; padding-left: 4px; }
+        .inline-label { font-size: 10.5px; color: #777; }
 
         .status-bar {
             margin-left: auto;
@@ -84,18 +123,18 @@
             align-items: center;
             gap: 14px;
             font-size: 11px;
-            color: #aaa;
+            color: #444;
             padding-left: 14px;
-            border-left: 1px solid #45464b;
+            border-left: 1px solid #d0d0d0;
             white-space: nowrap;
         }
-        .status-bar strong { color: #ffcc66; }
+        .status-bar strong { color: #b8860b; }
         .status-bar .sheet-tag {
             background: #7a0000; color: #fff; font-weight: 700; font-size: 10px;
             padding: 3px 8px; border-radius: 3px; letter-spacing: 0.5px;
         }
 
-        select { background-color: #252526; color: white; border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 3px; font-size: 11px; }
+        select { background-color: #ffffff; color: #1a1a1a; border: 1px solid var(--border-color); padding: 3px 6px; border-radius: 3px; font-size: 11px; }
 
         .main-container {
             display: flex;
@@ -132,23 +171,23 @@
 
         .toggle-tab-left {
             width: 24px;
-            background: #3a3a3a;
+            background: #dcdcdc;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: #1a1a1a;
             font-size: 11px;
             font-weight: bold;
             height: 100%;
         }
-        .toggle-tab-left:hover { background: var(--accent-color); }
+        .toggle-tab-left:hover { background: var(--accent-color); color: #fff; }
 
         .canvas-container {
             flex: 1;
             height: 100%;
-            background-color: #141414;
+            background-color: #d6d6d6;
             position: relative;
-            overflow: hidden; 
+            overflow: hidden;
             cursor: crosshair;
             touch-action: none;
         }
@@ -177,16 +216,16 @@
 
         .toggle-tab {
             width: 24px;
-            background: #3a3a3a;
+            background: #dcdcdc;
             display: flex;
             align-items: center;
             justify-content: center;
             border-right: 1px solid var(--border-color);
-            color: #fff;
+            color: #1a1a1a;
             font-size: 11px;
             font-weight: bold;
         }
-        .toggle-tab:hover { background: var(--accent-color); }
+        .toggle-tab:hover { background: var(--accent-color); color: #fff; }
 
         .props-content {
             flex: 1;
@@ -201,36 +240,36 @@
         }
         .props-wrapper.collapsed .props-content { display: none; }
 
-        .panel-title { font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; color: #aaa; margin-bottom: 5px; }
-        
+        .panel-title { font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; color: #555; margin-bottom: 5px; }
+
         .lib-category-header {
-            font-size: 11px; font-weight: bold; background: #3c3c3c; padding: 5px 8px; color: #ffaa00;
+            font-size: 11px; font-weight: bold; background: #dcdcdc; padding: 5px 8px; color: #a35b00;
             border-radius: 3px; margin: 8px 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;
             display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;
         }
-        .lib-category-header:hover { background: #464646; }
+        .lib-category-header:hover { background: #cfcfcf; }
         .lib-category-header .lib-cat-chevron { display: inline-block; transition: transform 0.15s ease; font-size: 9px; }
         .lib-category-header.collapsed .lib-cat-chevron { transform: rotate(-90deg); }
-        .lib-category-header .lib-cat-count { font-weight: normal; color: #999; font-size: 9.5px; margin-left: 6px; }
+        .lib-category-header .lib-cat-count { font-weight: normal; color: #777; font-size: 9.5px; margin-left: 6px; }
         .lib-category-body { display: flex; flex-direction: column; }
         .lib-category-body.collapsed { display: none; }
-        .lib-list { flex: 1; overflow-y: auto; border: 1px solid var(--border-color); background: #252526; border-radius: 3px; padding: 4px; }
-        .lib-item { padding: 5px 8px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .lib-item:hover { background-color: #37373d; color: #fff; }
+        .lib-list { flex: 1; overflow-y: auto; border: 1px solid var(--border-color); background: #ffffff; border-radius: 3px; padding: 4px; }
+        .lib-item { padding: 5px 8px; border-bottom: 1px solid #e2e2e2; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+        .lib-item:hover { background-color: var(--accent-color); color: #fff; }
 
         .prop-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
-        .prop-group label { font-size: 11px; color: #bbb; }
-        .prop-group input { background: #252526; border: 1px solid var(--border-color); color: white; padding: 4px; border-radius: 3px; font-size: 12px; }
-        
-        .pin-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; background: #333; padding: 3px; border-radius: 2px; }
-        .pin-row input { width: 45px; background: #161616; border: 1px solid #555; color: white; font-size: 11px; text-align: center; }
+        .prop-group label { font-size: 11px; color: #555; }
+        .prop-group input { background: #ffffff; border: 1px solid var(--border-color); color: #1a1a1a; padding: 4px; border-radius: 3px; font-size: 12px; }
+
+        .pin-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; background: #ececec; padding: 3px; border-radius: 2px; }
+        .pin-row input { width: 45px; background: #ffffff; border: 1px solid #bbb; color: #1a1a1a; font-size: 11px; text-align: center; }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; }
         .modal-box { background: #f4f4f4; color: #1a1a1a; width: 90%; max-width: 960px; max-height: 88vh; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header { background: #2f3136; color: #fff; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #7a0000; }
+        .modal-header { background: #f0f0f0; color: #1a1a1a; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #7a0000; }
         .modal-header h2 { margin: 0; font-size: 15px; }
-        .modal-header .btn { background: #555; }
+        .modal-header .btn { background: #dcdcdc; }
         .modal-body { padding: 14px 18px; overflow-y: auto; background: #fff; }
         .modal-footer { padding: 10px 18px; background: #eaeaea; border-top: 1px solid #ccc; display: flex; gap: 8px; justify-content: flex-end; }
         table.bom-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -255,19 +294,20 @@
             .toolbar-groups-wrap {
                 display: none;
                 position: absolute; top: 100%; left: 0; right: 0;
-                background: #26272b; border-bottom: 2px solid #7a0000;
+                background: #f5f5f5; border-bottom: 2px solid #7a0000;
                 flex-direction: column; align-items: stretch; gap: 0;
                 max-height: 75vh; overflow-y: auto; z-index: 80;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.25);
                 padding: 6px 10px 10px 10px;
             }
-            .toolbar-groups-wrap.open { display: flex; }
+            .toolbar-groups-wrap.open { display: flex; flex-wrap: wrap; gap: 4px; }
             .toolbar-groups-wrap .separator.tall { display: none; }
-            .toolbar-groups-wrap .toolbar-group {
-                border-bottom: 1px solid #3d3e42; padding: 8px 2px; width: 100%;
-            }
-            .toolbar-groups-wrap .toolbar-group:last-child { border-bottom: none; }
-            .toolbar-groups-wrap .group-row { flex-wrap: wrap; row-gap: 6px; }
+            /* On phone, each top-level menu opens as a full-width inline dropdown
+               (rather than a floating popover) since the header itself already
+               becomes a scrollable panel here. */
+            .toolbar-groups-wrap .menu-top { width: 100%; }
+            .toolbar-groups-wrap .menu-top-btn { width: 100%; justify-content: space-between; }
+            .toolbar-groups-wrap .menu-dropdown { position: static; width: 100%; box-shadow: none; margin-top: 2px; }
             .toolbar-groups-wrap .btn, .toolbar-groups-wrap select { padding: 8px 12px; font-size: 13px; }
 
             .status-bar { margin-left: auto; gap: 8px; font-size: 10.5px; }
@@ -311,89 +351,9 @@
 
         <div class="separator tall"></div>
 
-        <div class="toolbar-groups-wrap" id="toolbarGroupsWrap">
-        <div class="toolbar-group">
-            <span class="group-label">File</span>
-            <div class="group-row">
-                <button class="btn" onclick="createNewFile()" title="New drawing">📄 New</button>
-                <button class="btn" onclick="document.getElementById('fileInput').click()" title="Open project">📂 Open</button>
-                <button class="btn" onclick="exportJSON()" title="Save project">💾 Save</button>
-                <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)">
-            </div>
-        </div>
-
-        <div class="separator tall"></div>
-
-        <div class="toolbar-group">
-            <span class="group-label">Output</span>
-            <div class="group-row">
-                <button class="btn btn-green" onclick="exportAsDXF()" title="Export DXF">⇩ DXF</button>
-                <button class="btn btn-orange" onclick="exportAsJPG()" title="Export JPG image">🖼️ JPG</button>
-                <button class="btn btn-blue" onclick="printSchematicSheet()" title="Print sheet">🖨️ Print</button>
-            </div>
-        </div>
-
-        <div class="separator tall"></div>
-
-        <div class="toolbar-group">
-            <span class="group-label">Parts</span>
-            <div class="group-row">
-                <button class="btn" style="background-color:#7a0000;" onclick="openBOMModal()" title="Generate Bill of Materials">📋 BOM</button>
-            </div>
-        </div>
-
-        <div class="separator tall"></div>
-
-        <div class="toolbar-group">
-            <span class="group-label">Edit</span>
-            <div class="group-row">
-                <button class="btn" onclick="copySelection()" title="Copy selection (Ctrl+C)">⧉ Copy</button>
-                <button class="btn" onclick="cutSelection()" title="Cut selection (Ctrl+X)">✂ Cut</button>
-                <button class="btn" onclick="pasteClipboard()" title="Paste (Ctrl+V)">📋 Paste</button>
-                <button class="btn" onclick="groupSelection()" title="Group selection (Ctrl+G)">⛶ Group</button>
-                <button class="btn" onclick="ungroupSelection()" title="Ungroup selection (Ctrl+Shift+G)">⛶ Ungroup</button>
-            </div>
-        </div>
-
-        <div class="separator tall"></div>
-
-        <div class="toolbar-group">
-            <span class="group-label">Insert</span>
-            <div class="group-row">
-                <button class="btn btn-purple" onclick="enableTextPlacementMode()" title="Add text annotation">🔤 Text</button>
-                <button class="btn btn-orange" onclick="document.getElementById('imageComponentInput').click()" title="Import symbol image">🖼️ Symbol</button>
-                <input type="file" id="imageComponentInput" accept="image/*" style="display:none" onchange="handleUserImageUpload(event)">
-            </div>
-        </div>
-
-        <div class="separator tall"></div>
-
-        <div class="toolbar-group">
-            <span class="group-label">Draw</span>
-            <div class="group-row">
-                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_LINE')" title="Line">╱ Line</button>
-                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_POLYLINE')" title="Polyline">╱╲ Poly</button>
-                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_RECT')" title="Rectangle">█ Rect</button>
-                <button class="btn btn-shape" onclick="setDrawingMode('DRAW_CIRCLE')" title="Circle">◯ Circle</button>
-                <button class="btn btn-shape" onclick="setDrawingMode('ADD_PIN')" title="Terminal pin">▪ Pin</button>
-            </div>
-        </div>
-
-        <div class="separator tall"></div>
-
-        <div class="toolbar-group">
-            <span class="group-label">View</span>
-            <div class="group-row">
-                <label class="inline-label">Grid</label>
-                <select id="gridSizeSelect" onchange="changeGridSize(this.value)">
-                    <option value="5" selected>5 px</option>
-                    <option value="10">10 px</option>
-                    <option value="20">20 px</option>
-                </select>
-                <button class="btn" onclick="resetZoomView()" title="Fit to view">🔍 Fit</button>
-            </div>
-        </div>
-        </div>
+        <div class="toolbar-groups-wrap" id="toolbarGroupsWrap"><!-- populated by buildMenuBar() --></div>
+        <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)">
+        <input type="file" id="imageComponentInput" accept="image/*" style="display:none" onchange="handleUserImageUpload(event)">
 
         <div class="status-bar">
             <span>Zoom: <strong id="zoomIndicator">100%</strong></span>
@@ -410,11 +370,16 @@
                 <div class="panel-title">Engineering Structural Library</div>
                 <div class="lib-list" id="libraryList"></div>
                 
-                <div style="font-size: 11px; color: #aaa; line-height: 1.3; background:#222; padding:8px; border-radius:4px;">
-                    <strong style="color:#ffaa00;">Controls:</strong><br>
+                <div style="font-size: 11px; color: #444; line-height: 1.3; background:#e8e8e8; padding:8px; border-radius:4px;">
+                    <strong style="color:#a35b00;">Controls:</strong><br>
                     • <strong>Wires/Nets:</strong> Select paths directly or drag box windows to clear via Backspace.<br>
                     • <strong>Move Pins:</strong> Click a part, then drag any red terminal pin dot.<br>
+                    • <strong>Resize/Reshape:</strong> Select a rectangle, circle, ellipse or polyline, then drag its blue handles.<br>
                     • <strong>Marquee Box:</strong> Drag empty space to sweep-select multiple parts or custom lines.<br>
+                    • <strong>Group Drag:</strong> Ctrl+G groups a selection; dragging any member moves the whole group.<br>
+                    • <strong>Copy/Paste:</strong> Ctrl+C / Ctrl+V — pasted items share a group, so you can drag them all at once.<br>
+                    • <strong>Undo/Redo:</strong> Ctrl+Z / Ctrl+Shift+Z.<br>
+                    • <strong>Select All:</strong> Ctrl+A.<br>
                     • <strong>Spacebar:</strong> Rotate highlighted elements 90°.
                 </div>
             </div>
@@ -424,6 +389,7 @@
         <div class="canvas-container" id="viewportWindow">
             <canvas id="schematicCanvas" width="1414" height="1000"></canvas>
         </div>
+        <div class="context-menu" id="contextMenu"></div>
 
         <div class="props-wrapper" id="rightPropsPanel">
             <div class="toggle-tab" onclick="toggleRightPanel()">◂ ▸</div>
@@ -431,10 +397,13 @@
                 <div class="panel-title">Style Configuration</div>
                 <div class="prop-group">
                     <label>Element Stroke Color</label>
-                    <input type="color" id="globalColorInput" value="#000000" oninput="handleColorPickerInput(this.value)" style="padding:0; height:26px; width:100%;">
+                    <div style="display:flex; gap:4px;">
+                        <input type="color" id="globalColorInput" value="#000000" oninput="handleColorPickerInput(this.value)" style="padding:0; height:26px; flex:1;">
+                        <button class="btn" type="button" title="Close color picker" onclick="document.getElementById('globalColorInput').blur()" style="padding:0 10px; height:26px;">✕</button>
+                    </div>
                 </div>
 
-                <div id="inspectorSection" style="display: none; background: #222; padding: 10px; border-radius: 4px; border-left: 3px solid var(--accent-color);">
+                <div id="inspectorSection" style="display: none; background: #e8e8e8; padding: 10px; border-radius: 4px; border-left: 3px solid var(--accent-color);">
                     <div class="panel-title" style="color: #007acc;" id="inspectorHeaderTitle">Element Inspector</div>
                     <div class="prop-group" id="inspectNameGroup">
                         <label id="inspectNameLabel">Designator Name</label>
@@ -519,7 +488,12 @@
                 <div style="font-size:11.5px; color:#333; line-height:1.6;">
                     • <strong>Wires/Nets:</strong> select directly, or drag a box and press Backspace to clear.<br>
                     • <strong>Move Pins:</strong> click a part, then drag any red terminal pin dot.<br>
+                    • <strong>Resize/Reshape:</strong> select a rectangle, circle, ellipse or polyline, then drag its blue handles.<br>
                     • <strong>Marquee Box:</strong> drag empty canvas space to sweep-select multiple items.<br>
+                    • <strong>Group Drag:</strong> Ctrl+G groups a selection so dragging any member moves the whole group.<br>
+                    • <strong>Copy/Paste:</strong> Ctrl+C / Ctrl+V — pasted items are grouped so you can drag them all at once.<br>
+                    • <strong>Undo/Redo:</strong> Ctrl+Z / Ctrl+Shift+Z.<br>
+                    • <strong>Select All:</strong> Ctrl+A.<br>
                     • <strong>Spacebar:</strong> rotate the highlighted selection 90°.
                 </div>
                 <div style="font-size:11px; color:#888; margin-top:14px; border-top:1px solid #ddd; padding-top:8px;">
@@ -845,6 +819,30 @@
                 }
             },
             {
+                name: "Banana Jack", prefix: "J", type: "BANANA_JACK", category: "Electrical Components", width: 30, height: 34, resizable: false,
+                pins: [{x:15, y:34}],
+                drawVector: (ctx, w, h) => {
+                    ctx.beginPath(); ctx.arc(15, 14, 11, 0, 2 * Math.PI); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(15, 14, 4, 0, 2 * Math.PI); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(15, 25); ctx.lineTo(15, 34); ctx.stroke();
+                }
+            },
+            {
+                name: "BNC Connector", prefix: "J", type: "BNC_CONN", category: "Electrical Components", width: 40, height: 34, resizable: false,
+                pins: [{x:0, y:17}],
+                drawVector: (ctx, w, h) => {
+                    ctx.beginPath(); ctx.arc(24, 17, 12, 0, 2 * Math.PI); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(24, 17, 4, 0, 2 * Math.PI); ctx.fill();
+                    ctx.beginPath();
+                    ctx.moveTo(12, 10); ctx.lineTo(4, 6);
+                    ctx.moveTo(12, 24); ctx.lineTo(4, 28);
+                    ctx.moveTo(6, 4); ctx.lineTo(2, 8);
+                    ctx.moveTo(6, 30); ctx.lineTo(2, 26);
+                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, 17); ctx.lineTo(12, 17); ctx.stroke();
+                }
+            },
+            {
                 name: "AND Gate", prefix: "U", type: "GATE_AND", category: "Logic Gates", width: 50, height: 40, resizable: false,
                 pins: [{x:0, y:10}, {x:0, y:30}, {x:50, y:20}],
                 drawVector: (ctx, w, h) => {
@@ -1079,34 +1077,210 @@
 
         let activeWirePoints = []; 
         let isDraggingEntity = false; let isPanningView = false; let panStartOffset = {x:0, y:0};
+        let rightClickMoved = false; let rightClickStartClient = null;
         let isMarqueeSelecting = false; let marqueeStart = {x: 0, y: 0}; let marqueeEnd = {x: 0, y: 0};
         
         let isResizing = false; let resizeTargetEntity = null;
         let isDraggingPin = false; let dragPinEntity = null; let dragPinType = null; let dragPinIndex = -1;
         let isDraggingLabel = false; let dragLabelEntity = null; let dragLabelClickOffset = { x: 0, y: 0 };
+        let isDraggingShapeHandle = false; let dragShapeHandleEntity = null; let dragShapeHandleInfo = null;
         let clipboard = []; let pasteGeneration = 0;
         const RACK_U_PX = 25; // px per rack U, matches the 1U/2U/3U sizing used by the Rack Systems Layout parts
 
+        // ---------- Undo / Redo ----------
+        let undoStack = []; let redoStack = []; const MAX_UNDO = 50;
+        let pendingDragSnapshot = null; // captured at drag-start; committed on mouseup only if something actually changed
+
         let draggedEntities = []; let initialMouseModelPos = { x: 0, y: 0 };
         let activePolylinePoints = []; let renderRequested = false; let shapeDraftStart = null;
+        let isFreehandDrawing = false;
+        let arcDraftPoints = []; // 0-3 points collected while in DRAW_ARC mode: [start, end, throughPoint]
         let globalSelectedColor = "#000000"; 
         let currentMouseModelPos = { x: 0, y: 0 };
 
         const MOBILE_BREAKPOINT = 900;
 
         window.onload = () => {
-            renderLibrary(); 
+            renderLibrary();
+            buildMenuBar();
             setTimeout(resetZoomView, 100);
             setupInteractions();
             setupTouchSupport();
+            setupContextMenu();
             setupPWA();
             if (window.innerWidth <= MOBILE_BREAKPOINT) {
                 document.getElementById('leftSidebarPanel').classList.add('collapsed');
                 document.getElementById('rightPropsPanel').classList.add('collapsed');
             }
             window.addEventListener('resize', () => { resetZoomView(); });
-            document.getElementById('toolbarGroupsWrap').addEventListener('click', (e) => { if (e.target.closest('button')) closeMobileMenuIfOpen(); });
         };
+
+        // ---------- Menu tree ----------
+        // A single source of truth for every command the app exposes, grouped the way
+        // a traditional app menu bar is. Used to build BOTH the header's dropdown menu
+        // bar and the right-click/long-press context menu, so the two never drift out
+        // of sync — adding a command here adds it to both places at once.
+        function buildMenuTree() {
+            return [
+                { label: 'File', items: [
+                    { label: 'New', icon: '📄', title: 'New drawing', action: () => createNewFile() },
+                    { label: 'Open', icon: '📂', title: 'Open project', action: () => document.getElementById('fileInput').click() },
+                    { label: 'Save', icon: '💾', title: 'Save project', action: () => exportJSON() },
+                ]},
+                { label: 'Edit', items: [
+                    { label: 'Copy', icon: '⧉', title: 'Copy selection (Ctrl+C)', action: () => copySelection() },
+                    { label: 'Cut', icon: '✂', title: 'Cut selection (Ctrl+X)', action: () => cutSelection() },
+                    { label: 'Paste', icon: '📋', title: 'Paste (Ctrl+V)', action: () => pasteClipboard() },
+                    { label: 'Group', icon: '⛶', title: 'Group selection (Ctrl+G)', action: () => groupSelection() },
+                    { label: 'Ungroup', icon: '⛶', title: 'Ungroup selection (Ctrl+Shift+G)', action: () => ungroupSelection() },
+                    { label: 'Rotate 90° CW', icon: '⟳', title: 'Rotate selected component(s) 90° clockwise (Spacebar)', action: () => rotateSelectionCW() },
+                    { label: 'Undo', icon: '↺', title: 'Undo (Ctrl+Z)', action: () => undo() },
+                    { label: 'Redo', icon: '↻', title: 'Redo (Ctrl+Shift+Z)', action: () => redo() },
+                    { label: 'Select All', icon: '▦', title: 'Select all (Ctrl+A)', action: () => selectAllEntities() },
+                ]},
+                { label: 'Insert', items: [
+                    { label: 'Text', icon: '🔤', title: 'Add text annotation', action: () => enableTextPlacementMode() },
+                    { label: 'Symbol Image', icon: '🖼️', title: 'Import symbol image', action: () => document.getElementById('imageComponentInput').click() },
+                ]},
+                { label: 'Draw', items: [
+                    { label: 'Line', icon: '╱', title: 'Line', action: () => setDrawingMode('DRAW_LINE') },
+                    { label: 'Polyline', icon: '╱╲', title: 'Polyline (click each point, Esc/right-click to finish)', action: () => setDrawingMode('DRAW_POLYLINE') },
+                    { label: 'Freehand', icon: '✎', title: 'Freehand — click and drag to sketch', action: () => setDrawingMode('DRAW_FREEHAND') },
+                    { label: 'Rectangle', icon: '█', title: 'Rectangle', action: () => setDrawingMode('DRAW_RECT') },
+                    { label: 'Circle', icon: '◯', title: 'Circle', action: () => setDrawingMode('DRAW_CIRCLE') },
+                    { label: 'Ellipse', icon: '⬭', title: 'Ellipse', action: () => setDrawingMode('DRAW_ELLIPSE') },
+                    { label: 'Arc', icon: '⌒', title: 'Arc — click start, end, then a point to bulge through', action: () => setDrawingMode('DRAW_ARC') },
+                    { label: 'Terminal Pin', icon: '▪', title: 'Terminal pin', action: () => setDrawingMode('ADD_PIN') },
+                ]},
+                { label: 'View', items: [
+                    { label: 'Fit to View', icon: '🔍', title: 'Fit to view', action: () => resetZoomView() },
+                    { label: 'Grid: 5 px', icon: '▦', title: 'Snap grid 5px', action: () => changeGridSize(5), checked: () => currentGridSize === 5 },
+                    { label: 'Grid: 10 px', icon: '▦', title: 'Snap grid 10px', action: () => changeGridSize(10), checked: () => currentGridSize === 10 },
+                    { label: 'Grid: 20 px', icon: '▦', title: 'Snap grid 20px', action: () => changeGridSize(20), checked: () => currentGridSize === 20 },
+                ]},
+                { label: 'Output', items: [
+                    { label: 'Export DXF', icon: '⇩', title: 'Export DXF', action: () => exportAsDXF() },
+                    { label: 'Export JPG', icon: '🖼️', title: 'Export JPG image', action: () => exportAsJPG() },
+                    { label: 'Print', icon: '🖨️', title: 'Print sheet', action: () => printSchematicSheet() },
+                ]},
+                { label: 'Parts', items: [
+                    { label: 'Bill of Materials', icon: '📋', title: 'Generate Bill of Materials', action: () => openBOMModal() },
+                ]}
+            ];
+        }
+        const MENU_TREE = buildMenuTree();
+
+        function buildMenuItemButton(item) {
+            const el = document.createElement('button');
+            el.type = 'button'; el.className = 'btn menu-item'; el.title = item.title || '';
+            const checkMark = item.checked && item.checked() ? '<span class="menu-item-check">✓</span>' : '';
+            el.innerHTML = `<span class="menu-item-icon">${item.icon || ''}</span><span>${item.label}</span>${checkMark}`;
+            el.onclick = (e) => { e.stopPropagation(); item.action(); closeAllMenus(); closeContextMenu(); closeMobileMenuIfOpen(); };
+            return el;
+        }
+
+        function buildMenuBar() {
+            const wrap = document.getElementById('toolbarGroupsWrap');
+            wrap.innerHTML = '';
+            MENU_TREE.forEach(group => {
+                const top = document.createElement('div');
+                top.className = 'menu-top';
+                const topBtn = document.createElement('button');
+                topBtn.type = 'button'; topBtn.className = 'btn menu-top-btn';
+                topBtn.innerHTML = `<span>${group.label}</span><span class="caret">▾</span>`;
+                topBtn.onclick = (e) => { e.stopPropagation(); toggleMenu(top); };
+                const dropdown = document.createElement('div');
+                dropdown.className = 'menu-dropdown';
+                group.items.forEach(item => dropdown.appendChild(buildMenuItemButton(item)));
+                top.appendChild(topBtn); top.appendChild(dropdown);
+                wrap.appendChild(top);
+            });
+        }
+
+        function toggleMenu(topEl) {
+            const wasOpen = topEl.classList.contains('open');
+            closeAllMenus();
+            if (!wasOpen) {
+                // Refresh checkmarks (grid size, etc.) each time a menu opens.
+                const dropdown = topEl.querySelector('.menu-dropdown');
+                const groupIndex = Array.from(topEl.parentElement.children).indexOf(topEl);
+                if (dropdown && MENU_TREE[groupIndex]) {
+                    dropdown.innerHTML = '';
+                    MENU_TREE[groupIndex].items.forEach(item => dropdown.appendChild(buildMenuItemButton(item)));
+                }
+                topEl.classList.add('open');
+            }
+        }
+        function closeAllMenus() { document.querySelectorAll('.menu-top.open').forEach(m => m.classList.remove('open')); }
+        document.addEventListener('click', closeAllMenus);
+
+        // ---------- Context menu (right-click / long-press) ----------
+        // Renders every group from MENU_TREE as a collapsible tree (like the library
+        // sidebar's categories) so all commands the header menu bar offers are also
+        // reachable from the canvas, without the whole thing having to be tall enough
+        // to show every command at once. Only the group under the cursor's section is
+        // expanded by default; the rest are one tap away.
+        let contextMenuExpanded = {};
+
+        function setupContextMenu() {
+            document.addEventListener('click', (e) => {
+                // A click inside the menu (e.g. a group header toggling open/closed)
+                // must not also close it — only an outside click does.
+                if (!e.target.closest('#contextMenu')) closeContextMenu();
+            });
+            document.addEventListener('scroll', (e) => {
+                // Scrolling the menu's own (possibly still-long) item list is normal
+                // use, not a "click away" — only close for a scroll elsewhere on the
+                // page. This was the bug: closing on every scroll, including inside
+                // the menu, made it impossible to scroll a tall menu at all.
+                const menu = document.getElementById('contextMenu');
+                if (menu.contains(e.target)) return;
+                closeContextMenu();
+            }, true);
+            window.addEventListener('resize', closeContextMenu);
+        }
+
+        function renderContextMenuContent(anchorGroupLabel) {
+            const menu = document.getElementById('contextMenu');
+            menu.innerHTML = '';
+            MENU_TREE.forEach(group => {
+                const header = document.createElement('button');
+                header.type = 'button'; header.className = 'context-menu-group-header';
+                const isOpen = !!contextMenuExpanded[group.label];
+                header.innerHTML = `<span class="context-menu-chevron">${isOpen ? '▾' : '▸'}</span><span>${group.label}</span>`;
+                header.onclick = (e) => {
+                    e.stopPropagation();
+                    contextMenuExpanded[group.label] = !contextMenuExpanded[group.label];
+                    renderContextMenuContent();
+                };
+                menu.appendChild(header);
+                if (isOpen) {
+                    const body = document.createElement('div');
+                    body.className = 'context-menu-group-body';
+                    group.items.forEach(item => body.appendChild(buildMenuItemButton(item)));
+                    menu.appendChild(body);
+                }
+            });
+        }
+
+        function openContextMenu(clientX, clientY) {
+            const menu = document.getElementById('contextMenu');
+            // Every section starts collapsed each time the menu is (re-)opened, so it
+            // opens small — the user drills into whichever group they need.
+            contextMenuExpanded = {};
+            renderContextMenuContent();
+            // Show first (off-screen) to measure, then clamp inside the viewport so it
+            // never opens partly off the edge of the screen.
+            menu.classList.add('open');
+            menu.style.left = '0px'; menu.style.top = '0px';
+            const w = menu.offsetWidth, h = menu.offsetHeight;
+            const left = Math.min(clientX, window.innerWidth - w - 8);
+            const top = Math.min(clientY, window.innerHeight - h - 8);
+            menu.style.left = Math.max(4, left) + 'px';
+            menu.style.top = Math.max(4, top) + 'px';
+        }
+
+        function closeContextMenu() { document.getElementById('contextMenu').classList.remove('open'); }
 
         // ---------- PWA: install prompt + service worker ----------
         let deferredInstallPrompt = null;
@@ -1170,7 +1344,7 @@
         function snapToGrid(val) { return Math.round(val / currentGridSize) * currentGridSize; }
         function changeGridSize(val) { currentGridSize = parseInt(val); requestRender(); }
         function enableTextPlacementMode() { setMode('PLACE_TEXT'); selectedLibraryPart = null; shapeDraftStart = null; activePolylinePoints = []; }
-        function setDrawingMode(shapeMode) { setMode(shapeMode); selectedLibraryPart = null; shapeDraftStart = null; activePolylinePoints = []; requestRender(); }
+        function setDrawingMode(shapeMode) { setMode(shapeMode); selectedLibraryPart = null; shapeDraftStart = null; activePolylinePoints = []; isFreehandDrawing = false; arcDraftPoints = []; requestRender(); }
 
         function isPointNearLine(mx, my, x1, y1, x2, y2, tolerance = 6) {
             let A = mx - x1; let B = my - y1; let C = x2 - x1; let D = y2 - y1;
@@ -1235,6 +1409,29 @@
             return local.x >= b.x && local.x <= b.x + b.w && local.y >= b.y && local.y <= b.y + b.h;
         }
 
+        // Draggable handle points for a drawn shape: every vertex for a polyline (so the
+        // user can reshape it after drawing), or the two defining corner/endpoints for
+        // anything else (line endpoints, rect corners, circle center+radius, ellipse
+        // bounding-box corners) — resizing any of these is just dragging one of these
+        // two points, so no per-type resize logic is needed beyond this.
+        function getShapeHandles(shape) {
+            if (shape.type === 'DRAW_POLYLINE') {
+                return (shape.points || []).map((p, i) => ({ x: p.x, y: p.y, kind: 'vertex', index: i }));
+            }
+            if (shape.type === 'DRAW_ARC') {
+                return [
+                    { x: shape.p1.x, y: shape.p1.y, kind: 'arcpt', index: 0 },
+                    { x: shape.p2.x, y: shape.p2.y, kind: 'arcpt', index: 1 },
+                    { x: shape.p3.x, y: shape.p3.y, kind: 'arcpt', index: 2 }
+                ];
+            }
+            return [{ x: shape.x1, y: shape.y1, kind: 'p1' }, { x: shape.x2, y: shape.y2, kind: 'p2' }];
+        }
+
+        function findShapeHandleAt(mx, my, shape, tolerance = 8) {
+            return getShapeHandles(shape).find(h => Math.hypot(h.x - mx, h.y - my) <= tolerance);
+        }
+
         function openInspector(entity, type) {
             if (window.innerWidth <= MOBILE_BREAKPOINT) { document.getElementById('rightPropsPanel').classList.remove('collapsed'); }
             const panel = document.getElementById('inspectorSection');
@@ -1291,6 +1488,58 @@
             requestRender();
         }
 
+        // ---------- Undo / Redo ----------
+        // projectData is snapshotted as JSON before each mutating action. Two fields
+        // aren't JSON-safe and are stripped before stringifying, then rebuilt on restore:
+        // a component's `drawVector` (a function, looked back up from componentLibrary by
+        // `type`) and a custom image's `imgElement` (a DOM Image, rebuilt from its `src`
+        // data URL, which IS plain JSON-safe).
+        function serializeProjectData() {
+            const safe = {
+                ...projectData,
+                components: projectData.components.map(({ drawVector, ...rest }) => rest),
+                customImages: (projectData.customImages || []).map(({ imgElement, ...rest }) => rest)
+            };
+            return JSON.stringify(safe);
+        }
+
+        function restoreProjectData(json) {
+            const data = JSON.parse(json);
+            data.components = (data.components || []).map(c => {
+                const libPart = componentLibrary.find(p => p.type === c.type);
+                return { ...c, drawVector: libPart ? libPart.drawVector : undefined };
+            });
+            data.customImages = (data.customImages || []).map(im => {
+                const img = new Image(); img.src = im.src;
+                return { ...im, imgElement: img };
+            });
+            projectData = data;
+            selectedEntities = [];
+            closeInspector();
+            updateTitleBlockInputsFromData();
+            requestRender();
+        }
+
+        // Call BEFORE any discrete mutation (place, delete, paste, group, rotate, ...) —
+        // captures the state to revert TO if the user then presses Ctrl+Z.
+        function pushUndo() {
+            undoStack.push(serializeProjectData());
+            if (undoStack.length > MAX_UNDO) undoStack.shift();
+            redoStack = [];
+        }
+
+        function undo() {
+            if (!undoStack.length) return;
+            redoStack.push(serializeProjectData());
+            restoreProjectData(undoStack.pop());
+        }
+
+        function redo() {
+            if (!redoStack.length) return;
+            undoStack.push(serializeProjectData());
+            restoreProjectData(redoStack.pop());
+        }
+
         // Next free number for a given reference-designator prefix. Uses the highest
         // existing number + 1 (not a plain count) so that deleting/cutting a part out of
         // sequence — then placing or pasting a new one — can never reissue a designator
@@ -1307,6 +1556,7 @@
 
         function deleteSelectedEntities() {
             if (selectedEntities.length === 0) return;
+            pushUndo();
             selectedEntities.forEach(item => {
                 if (item.type === 'COMP') projectData.components = projectData.components.filter(c => c.id !== item.entity.id);
                 else if (item.type === 'TEXT') projectData.annotations = projectData.annotations.filter(t => t.id !== item.entity.id);
@@ -1327,6 +1577,7 @@
         // click handler), so grouped parts move, copy and delete together.
         function groupSelection() {
             if (selectedEntities.length < 2) return;
+            pushUndo();
             const groupId = "GRP_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
             selectedEntities.forEach(item => {
                 if (['COMP', 'IMG', 'TEXT', 'SHAPE'].includes(item.type)) item.entity.groupId = groupId;
@@ -1336,7 +1587,38 @@
 
         function ungroupSelection() {
             if (selectedEntities.length === 0) return;
+            pushUndo();
             selectedEntities.forEach(item => { delete item.entity.groupId; });
+            requestRender();
+        }
+
+        // Rotates every selected component 90° clockwise (canvas rotate() with a
+        // positive angle is clockwise, since the y-axis points down) — shared by the
+        // Spacebar shortcut and the Rotate toolbar/menu button so touch users without
+        // a keyboard have the same action available.
+        function rotateSelectionCW() {
+            let containsComp = selectedEntities.some(item => item.type === 'COMP');
+            if (!containsComp) return;
+            pushUndo();
+            selectedEntities.forEach(item => { if (item.type === 'COMP') item.entity.rotation = ((item.entity.rotation || 0) + 90) % 360; });
+            requestRender();
+        }
+
+        // Selects every entity on the sheet — every component, image, note, drawn
+        // shape, wire, custom pin and wire junction — so the whole drawing can be
+        // moved, copied or deleted as one unit (Ctrl+A).
+        function selectAllEntities() {
+            selectedEntities = [
+                ...projectData.components.map(c => ({ entity: c, type: 'COMP' })),
+                ...projectData.customImages.map(im => ({ entity: im, type: 'IMG' })),
+                ...projectData.annotations.map(t => ({ entity: t, type: 'TEXT' })),
+                ...(projectData.shapes || []).map(s => ({ entity: s, type: 'SHAPE' })),
+                ...(projectData.wires || []).map(w => ({ entity: w, type: 'WIRE' })),
+                ...(projectData.customPins || []).map(p => ({ entity: p, type: 'PIN' })),
+                ...(projectData.junctions || []).map(j => ({ entity: j, type: 'JUNCTION' }))
+            ];
+            if (selectedEntities.length === 1) openInspector(selectedEntities[0].entity, selectedEntities[0].type);
+            else if (selectedEntities.length > 1) openInspector(selectedEntities[0].entity, 'GROUP');
             requestRender();
         }
 
@@ -1356,6 +1638,9 @@
         function cloneEntityForClipboard(entity, type) {
             if (type === 'SHAPE' && entity.type === 'DRAW_POLYLINE') {
                 return { ...entity, points: (entity.points || []).map(p => ({ ...p })) };
+            }
+            if (type === 'SHAPE' && entity.type === 'DRAW_ARC') {
+                return { ...entity, p1: { ...entity.p1 }, p2: { ...entity.p2 }, p3: { ...entity.p3 } };
             }
             return { ...entity, pins: entity.pins ? entity.pins.map(p => ({ ...p })) : entity.pins };
         }
@@ -1384,17 +1669,21 @@
 
         function pasteClipboard() {
             if (!clipboard.length) return;
+            pushUndo();
             pasteGeneration++;
             const offset = 20 * pasteGeneration;
-            const groupIdMap = {};
+            // Pasting more than one item at once gives the whole batch one shared
+            // groupId, so the user can move everything just pasted together with a
+            // single drag (same mechanism as any other group) instead of one at a time.
+            const batchGroupId = clipboard.length > 1 ? ("GRP_" + Date.now() + "_" + Math.floor(Math.random() * 1000)) : null;
+
             const newSelection = [];
 
             clipboard.forEach(clip => {
                 let newEntity = cloneEntityForClipboard(clip.entity, clip.type);
 
-                if (clip.entity.groupId) {
-                    if (!groupIdMap[clip.entity.groupId]) groupIdMap[clip.entity.groupId] = "GRP_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-                    newEntity.groupId = groupIdMap[clip.entity.groupId];
+                if (batchGroupId) {
+                    newEntity.groupId = batchGroupId;
                 } else {
                     delete newEntity.groupId;
                 }
@@ -1424,6 +1713,10 @@
                     newEntity.id = "SHP_" + Date.now() + Math.floor(Math.random() * 1000);
                     if (newEntity.type === 'DRAW_POLYLINE') {
                         newEntity.points = newEntity.points.map(p => ({ x: snapToGrid(p.x + offset), y: snapToGrid(p.y + offset) }));
+                    } else if (newEntity.type === 'DRAW_ARC') {
+                        newEntity.p1 = { x: snapToGrid(clip.entity.p1.x + offset), y: snapToGrid(clip.entity.p1.y + offset) };
+                        newEntity.p2 = { x: snapToGrid(clip.entity.p2.x + offset), y: snapToGrid(clip.entity.p2.y + offset) };
+                        newEntity.p3 = { x: snapToGrid(clip.entity.p3.x + offset), y: snapToGrid(clip.entity.p3.y + offset) };
                     } else {
                         newEntity.x1 = snapToGrid(clip.entity.x1 + offset); newEntity.y1 = snapToGrid(clip.entity.y1 + offset);
                         newEntity.x2 = snapToGrid(clip.entity.x2 + offset); newEntity.y2 = snapToGrid(clip.entity.y2 + offset);
@@ -1444,11 +1737,11 @@
             const container = document.getElementById('pinMatrixManagerContainer');
             if (!entity || !entity.pins) { container.innerHTML = ""; return; }
             
-            let html = `<div class="panel-title" style="margin-top:12px; color:#ffaa00;">Pin Terminal Configuration</div>`;
+            let html = `<div class="panel-title" style="margin-top:12px; color:#a35b00;">Pin Terminal Configuration</div>`;
             entity.pins.forEach((pin, index) => {
                 html += `
                 <div class="pin-row">
-                    <span style="font-size:10px; width:30px; color:#aaa;">P${index+1}:</span>
+                    <span style="font-size:10px; width:30px; color:#555;">P${index+1}:</span>
                     <label>X:</label>
                     <input type="number" value="${pin.x}" oninput="updatePinOffset(${index}, 'x', this.value)">
                     <label>Y:</label>
@@ -1533,11 +1826,57 @@
 
         function bakePolylinePath() {
             if (activePolylinePoints.length > 1) {
+                pushUndo();
                 projectData.shapes.push({
                     id: "SHP_" + Date.now(), type: 'DRAW_POLYLINE', points: [...activePolylinePoints], color: globalSelectedColor, pins: []
                 });
             }
             activePolylinePoints = []; setMode('SELECT'); requestRender();
+        }
+
+        // Bakes a freehand stroke (captured continuously on drag) the same way a
+        // polyline is baked — it reuses the DRAW_POLYLINE shape type and all of its
+        // rendering/selection/drag/vertex-handle machinery, so freehand strokes are
+        // just polylines with lots of closely-spaced points.
+        function bakeFreehandPath() {
+            if (activePolylinePoints.length > 1) {
+                pushUndo();
+                projectData.shapes.push({
+                    id: "SHP_" + Date.now(), type: 'DRAW_POLYLINE', points: [...activePolylinePoints], color: globalSelectedColor, pins: []
+                });
+            }
+            activePolylinePoints = []; isFreehandDrawing = false; setMode('SELECT'); requestRender();
+        }
+
+        // ---------- Arc (3-point: start, end, then a point the arc bulges through) ----------
+        // Returns the circle {cx, cy, r, startAngle, endAngle, anticlockwise} passing
+        // through all three points, with the sweep direction chosen so the arc from
+        // startAngle to endAngle actually passes through p3. Returns null for
+        // (near-)collinear points, where no finite circle fits.
+        function computeArcFromThreePoints(p1, p2, p3) {
+            const d = 2 * (p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y));
+            if (Math.abs(d) < 1e-6) return null;
+            const sq = (p) => p.x * p.x + p.y * p.y;
+            const cx = (sq(p1) * (p2.y - p3.y) + sq(p2) * (p3.y - p1.y) + sq(p3) * (p1.y - p2.y)) / d;
+            const cy = (sq(p1) * (p3.x - p2.x) + sq(p2) * (p1.x - p3.x) + sq(p3) * (p2.x - p1.x)) / d;
+            const r = Math.hypot(p1.x - cx, p1.y - cy);
+            const startAngle = Math.atan2(p1.y - cy, p1.x - cx);
+            const endAngle = Math.atan2(p2.y - cy, p2.x - cx);
+            const midAngle = Math.atan2(p3.y - cy, p3.x - cx);
+            const norm = (a) => ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            const s = norm(startAngle), e = norm(endAngle), m = norm(midAngle);
+            // Clockwise (canvas default, anticlockwise=false) sweep from s increases
+            // angle up to e (wrapping through 0 if e < s). Check whether m falls in
+            // that increasing sweep; if not, the through-point lies on the other arc,
+            // so flip to anticlockwise.
+            const inClockwiseSweep = e >= s ? (m >= s && m <= e) : (m >= s || m <= e);
+            return { cx, cy, r, startAngle, endAngle, anticlockwise: !inClockwiseSweep };
+        }
+
+        function strokeArcShape(ctx, shape) {
+            const arc = computeArcFromThreePoints(shape.p1, shape.p2, shape.p3);
+            if (!arc) return;
+            ctx.beginPath(); ctx.arc(arc.cx, arc.cy, arc.r, arc.startAngle, arc.endAngle, arc.anticlockwise); ctx.stroke();
         }
 
         function drawCanvas() {
@@ -1565,15 +1904,29 @@
                     } else if (shape.type === 'DRAW_CIRCLE') {
                         let rad = Math.hypot(shape.x2 - shape.x1, shape.y2 - shape.y1);
                         ctx.beginPath(); ctx.arc(shape.x1, shape.y1, rad, 0, 2 * Math.PI); ctx.stroke();
+                    } else if (shape.type === 'DRAW_ELLIPSE') {
+                        const ecx = (shape.x1 + shape.x2) / 2, ecy = (shape.y1 + shape.y2) / 2;
+                        const erx = Math.abs(shape.x2 - shape.x1) / 2, ery = Math.abs(shape.y2 - shape.y1) / 2;
+                        ctx.beginPath(); ctx.ellipse(ecx, ecy, erx, ery, 0, 0, 2 * Math.PI); ctx.stroke();
+                    } else if (shape.type === 'DRAW_ARC') {
+                        strokeArcShape(ctx, shape);
                     }
 
                     if (isEntitySelected(shape)) {
                         ctx.strokeStyle = "#007acc"; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
                         if (shape.type === 'DRAW_POLYLINE') {
                             shape.points.forEach(p => ctx.strokeRect(p.x - 4, p.y - 4, 8, 8));
+                        } else if (shape.type === 'DRAW_ARC') {
+                            const axs = [shape.p1.x, shape.p2.x, shape.p3.x], ays = [shape.p1.y, shape.p2.y, shape.p3.y];
+                            const axMin = Math.min(...axs), axMax = Math.max(...axs), ayMin = Math.min(...ays), ayMax = Math.max(...ays);
+                            ctx.strokeRect(axMin - 4, ayMin - 4, axMax - axMin + 8, ayMax - ayMin + 8);
                         } else {
                             ctx.strokeRect(Math.min(shape.x1, shape.x2) - 4, Math.min(shape.y1, shape.y2) - 4, Math.abs(shape.x2 - shape.x1) + 8, Math.abs(shape.y2 - shape.y1) + 8);
                         }
+                        // Draggable handles — endpoints for line/rect/circle/ellipse, or every
+                        // vertex for a polyline (lets the user reshape it after drawing).
+                        ctx.setLineDash([]); ctx.fillStyle = "#007acc";
+                        getShapeHandles(shape).forEach(h => { ctx.beginPath(); ctx.arc(h.x, h.y, 4, 0, 2 * Math.PI); ctx.fill(); });
                     }
                     ctx.restore();
                 });
@@ -1590,6 +1943,10 @@
                 } else if (currentMode === 'DRAW_CIRCLE') {
                     let rad = Math.hypot(targetX - shapeDraftStart.x, targetY - shapeDraftStart.y);
                     ctx.beginPath(); ctx.arc(shapeDraftStart.x, shapeDraftStart.y, rad, 0, 2 * Math.PI); ctx.stroke();
+                } else if (currentMode === 'DRAW_ELLIPSE') {
+                    const ecx = (shapeDraftStart.x + targetX) / 2, ecy = (shapeDraftStart.y + targetY) / 2;
+                    const erx = Math.abs(targetX - shapeDraftStart.x) / 2, ery = Math.abs(targetY - shapeDraftStart.y) / 2;
+                    ctx.beginPath(); ctx.ellipse(ecx, ecy, erx, ery, 0, 0, 2 * Math.PI); ctx.stroke();
                 }
                 ctx.restore();
             }
@@ -1600,6 +1957,30 @@
                 for(let i = 1; i < activePolylinePoints.length; i++) { ctx.lineTo(activePolylinePoints[i].x, activePolylinePoints[i].y); }
                 ctx.lineTo(snapToGrid(currentMouseModelPos.x), snapToGrid(currentMouseModelPos.y));
                 ctx.stroke(); ctx.restore();
+            }
+
+            if (currentMode === 'DRAW_FREEHAND' && activePolylinePoints.length > 0) {
+                ctx.save(); ctx.strokeStyle = globalSelectedColor; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(activePolylinePoints[0].x, activePolylinePoints[0].y);
+                for (let i = 1; i < activePolylinePoints.length; i++) { ctx.lineTo(activePolylinePoints[i].x, activePolylinePoints[i].y); }
+                ctx.stroke(); ctx.restore();
+            }
+
+            if (currentMode === 'DRAW_ARC' && arcDraftPoints.length > 0) {
+                ctx.save(); ctx.strokeStyle = globalSelectedColor; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+                const liveX = snapToGrid(currentMouseModelPos.x), liveY = snapToGrid(currentMouseModelPos.y);
+                if (arcDraftPoints.length === 1) {
+                    // Start point placed — show the chord to the cursor (still picking the end point).
+                    ctx.beginPath(); ctx.moveTo(arcDraftPoints[0].x, arcDraftPoints[0].y); ctx.lineTo(liveX, liveY); ctx.stroke();
+                } else if (arcDraftPoints.length === 2) {
+                    // Start + end placed — the cursor now controls the bulge/through-point.
+                    const arc = computeArcFromThreePoints(arcDraftPoints[0], arcDraftPoints[1], { x: liveX, y: liveY });
+                    if (arc) { ctx.beginPath(); ctx.arc(arc.cx, arc.cy, arc.r, arc.startAngle, arc.endAngle, arc.anticlockwise); ctx.stroke(); }
+                    else { ctx.beginPath(); ctx.moveTo(arcDraftPoints[0].x, arcDraftPoints[0].y); ctx.lineTo(arcDraftPoints[1].x, arcDraftPoints[1].y); ctx.stroke(); }
+                }
+                ctx.setLineDash([]); ctx.fillStyle = globalSelectedColor;
+                arcDraftPoints.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI); ctx.fill(); });
+                ctx.restore();
             }
 
             if (projectData.annotations) {
@@ -1907,11 +2288,35 @@
 
         function dropActiveTools() {
             if (currentMode === 'DRAW_POLYLINE') { bakePolylinePath(); return; }
-            activeWirePoints = []; shapeDraftStart = null; isMarqueeSelecting = false; isResizing = false; isDraggingPin = false; isDraggingLabel = false; dragLabelEntity = null;
+            activeWirePoints = []; shapeDraftStart = null; arcDraftPoints = []; isFreehandDrawing = false; activePolylinePoints = [];
+            isMarqueeSelecting = false; isResizing = false; isDraggingPin = false; isDraggingLabel = false; dragLabelEntity = null;
             selectedEntities = []; setMode('SELECT'); closeInspector();
         }
 
+        // Some browsers fail to repaint a custom/keyword cursor immediately when the
+        // pointer re-enters the canvas from a toolbar button (which forces its own
+        // cursor with !important) — it can be left showing the wrong (low-contrast or
+        // stale) cursor until some other event, like a click, forces a style recompute.
+        // Toggling the cursor property off and back on the next frame forces that
+        // recompute without waiting for a click.
+        //
+        // This always restores to '' (letting the .canvas-container CSS rule supply
+        // "crosshair"), rather than reading back and restoring whatever style.cursor
+        // happened to hold at call time. setMode() calls this on every mode change, and
+        // drawing/placing a shape fires several setMode() calls in quick succession —
+        // often faster than one animation frame — so calls can overlap. An earlier
+        // version restored to "whatever style.cursor currently is", which meant an
+        // overlapping second call could capture the first call's transient 'none' and
+        // schedule restoring the cursor to 'none' again, permanently hiding it. Always
+        // restoring to the same fixed value ('') is safe no matter how many calls
+        // overlap or what order their frames fire in.
+        function refreshCanvasCursor() {
+            viewport.style.cursor = 'none';
+            requestAnimationFrame(() => { viewport.style.cursor = ''; });
+        }
+
         function setupInteractions() {
+            viewport.addEventListener('mouseenter', refreshCanvasCursor);
             viewport.addEventListener('wheel', (e) => {
                 e.preventDefault(); const rect = viewport.getBoundingClientRect();
                 const mouseXS = e.clientX - rect.left; const mouseYS = e.clientY - rect.top;
@@ -1921,13 +2326,24 @@
                 applyTransformMatrix(); requestRender();
             }, { passive: false });
 
-            viewport.addEventListener('contextmenu', e => { e.preventDefault(); dropActiveTools(); requestRender(); });
+            viewport.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                const isDragging = isDraggingEntity || isResizing || isDraggingPin || isDraggingLabel || isDraggingShapeHandle || isMarqueeSelecting;
+                if (isDragging) return; // right click never activates anything mid-drag
+                if (currentMode !== 'SELECT') { dropActiveTools(); requestRender(); return; }
+                if (rightClickMoved) return; // it was a right-drag pan, not a context-menu click
+                openContextMenu(e.clientX, e.clientY);
+            });
 
 		 viewport.addEventListener('mousedown', (e) => {
 				const rect = viewport.getBoundingClientRect();
 				const modelPos = transformScreenToModel(e.clientX - rect.left, e.clientY - rect.top);
 
-				if (e.button === 2) { isPanningView = true; panStartOffset.x = e.clientX - viewPanX; panStartOffset.y = e.clientY - viewPanY; return; }
+				if (e.button === 2) {
+					isPanningView = true; panStartOffset.x = e.clientX - viewPanX; panStartOffset.y = e.clientY - viewPanY;
+					rightClickMoved = false; rightClickStartClient = { x: e.clientX, y: e.clientY };
+					return;
+				}
 				if (e.button !== 0) return;
 
 				if (currentMode === 'SELECT' && selectedEntities.length === 1) {
@@ -1939,6 +2355,7 @@
 								let pin = ent.pins[i];
 								let absPt = (activeItem.type === 'COMP') ? getAbsolutePinCoords(ent, pin) : { x: ent.x + pin.x, y: ent.y + pin.y };
 								if (Math.hypot(absPt.x - modelPos.x, absPt.y - modelPos.y) < 10) {
+									pendingDragSnapshot = serializeProjectData();
 									isDraggingPin = true; dragPinEntity = ent; dragPinType = activeItem.type; dragPinIndex = i;
 									return;
 								}
@@ -1951,8 +2368,19 @@
 						let ent = activeItem.entity;
 						if (isPointNearLabel(modelPos.x, modelPos.y, ent)) {
 							const local = modelPointToComponentLocal(modelPos.x, modelPos.y, ent);
+							pendingDragSnapshot = serializeProjectData();
 							isDraggingLabel = true; dragLabelEntity = ent;
 							dragLabelClickOffset = { x: local.x - (ent.labelDX ?? 0), y: local.y - (ent.labelDY ?? -6) };
+							return;
+						}
+					}
+					// Drawn-shape resize/reshape handle — line & rect & circle & ellipse
+					// endpoints, or a polyline's individual vertices.
+					if (activeItem.type === 'SHAPE') {
+						let handle = findShapeHandleAt(modelPos.x, modelPos.y, activeItem.entity);
+						if (handle) {
+							pendingDragSnapshot = serializeProjectData();
+							isDraggingShapeHandle = true; dragShapeHandleEntity = activeItem.entity; dragShapeHandleInfo = handle;
 							return;
 						}
 					}
@@ -1963,6 +2391,7 @@
 						let handleX = item.entity.x + item.entity.width;
 						let handleY = item.entity.y + item.entity.height;
 						if (Math.hypot(handleX - modelPos.x, handleY - modelPos.y) < 12) {
+							pendingDragSnapshot = serializeProjectData();
 							isResizing = true; resizeTargetEntity = item.entity;
 							return;
 						}
@@ -1973,7 +2402,7 @@
 					if (!projectData.customPins) {
 						projectData.customPins = [];
 					}
-
+					pushUndo();
 					projectData.customPins.push({
 						id: 'custom_pin_' + Date.now(),
 						x: modelPos.x,
@@ -1997,11 +2426,12 @@
 					} else {
 						let lastPt = activeWirePoints[activeWirePoints.length - 1];
 						let finalPt = Math.abs(modelPos.x - lastPt.x) > Math.abs(modelPos.y - lastPt.y) 
-							? { x: pinFound.x, y: lastPt.y } 
+							? { x: pinFound.x, y: lastPt.y }
 							: { x: lastPt.x, y: pinFound.y };
-						
+
+						pushUndo();
 						projectData.wires.push({ x1: lastPt.x, y1: lastPt.y, x2: finalPt.x, y2: finalPt.y, color: "#008800" });
-						dropActiveTools(); 
+						dropActiveTools();
 					}
 					requestRender(); 
 					return;
@@ -2011,9 +2441,10 @@
 				if (currentMode === 'WIRE' && wireFound && !pinFound) {
 					let lastPt = activeWirePoints[activeWirePoints.length - 1];
 					let finalPt = { x: wireFound.snapX, y: wireFound.snapY };
-					
+
+					pushUndo();
 					projectData.wires.push({ x1: lastPt.x, y1: lastPt.y, x2: finalPt.x, y2: finalPt.y, color: "#008800" });
-					
+
 					if (!projectData.junctions) {
 						projectData.junctions = [];
 					}
@@ -2032,6 +2463,7 @@
 						: { x: lastPt.x, y: modelPos.y };
 						
 					activeWirePoints.push(turningPt);
+					pushUndo();
 					projectData.wires.push({ x1: lastPt.x, y1: lastPt.y, x2: turningPt.x, y2: turningPt.y, color: "#008800" });
 
 					requestRender();
@@ -2043,10 +2475,36 @@
 					requestRender(); return;
 				}
 
-				if (['DRAW_LINE', 'DRAW_RECT', 'DRAW_CIRCLE'].includes(currentMode)) {
+				if (currentMode === 'DRAW_FREEHAND') {
+					// Not grid-snapped — freehand strokes are meant to follow the mouse
+					// exactly, snapping would make them look jagged/staircased.
+					isFreehandDrawing = true;
+					activePolylinePoints = [{ x: modelPos.x, y: modelPos.y }];
+					requestRender(); return;
+				}
+
+				if (currentMode === 'DRAW_ARC') {
+					arcDraftPoints.push({ x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y) });
+					if (arcDraftPoints.length === 3) {
+						const arc = computeArcFromThreePoints(arcDraftPoints[0], arcDraftPoints[1], arcDraftPoints[2]);
+						if (arc) {
+							pushUndo();
+							projectData.shapes.push({
+								id: "SHP_" + Date.now(), type: 'DRAW_ARC',
+								p1: arcDraftPoints[0], p2: arcDraftPoints[1], p3: arcDraftPoints[2],
+								color: globalSelectedColor, pins: []
+							});
+						}
+						arcDraftPoints = []; setMode('SELECT');
+					}
+					requestRender(); return;
+				}
+
+				if (['DRAW_LINE', 'DRAW_RECT', 'DRAW_CIRCLE', 'DRAW_ELLIPSE'].includes(currentMode)) {
 					if (!shapeDraftStart) {
 						shapeDraftStart = { x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y) };
 					} else {
+						pushUndo();
 						projectData.shapes.push({
 							id: "SHP_" + Date.now(), type: currentMode,
 							x1: shapeDraftStart.x, y1: shapeDraftStart.y,
@@ -2058,6 +2516,7 @@
 				}
 
 				if (currentMode === 'PLACE' && selectedLibraryPart) {
+					pushUndo();
 					const count = nextRefDesNumber(selectedLibraryPart.prefix);
 					let newPart = {
 						...selectedLibraryPart, id: Date.now(), x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y),
@@ -2069,6 +2528,7 @@
 					setMode('SELECT'); openInspector(newPart, 'COMP'); return;
 				} 
 				else if (currentMode === 'PLACE_TEXT') {
+					pushUndo();
 					let newTxt = { id: "TXT_" + Date.now(), text: "NOTE_ENTRY", x: snapToGrid(modelPos.x), y: snapToGrid(modelPos.y), showLabel: true, color: globalSelectedColor };
 					projectData.annotations.push(newTxt); selectedEntities = [{ entity: newTxt, type: 'TEXT' }];
 					setMode('SELECT'); openInspector(newTxt, 'TEXT'); return;
@@ -2083,8 +2543,13 @@
 						if (pFound) {
 							selectedEntities = [{ entity: pFound, type: 'PIN' }];
 							if (typeof openInspector === 'function') openInspector(pFound, 'PIN');
+							// Same generic drag-move mechanism used for every other entity type,
+							// so a placed pin can be dragged around like anything else.
+							pendingDragSnapshot = serializeProjectData();
+							isDraggingEntity = true; initialMouseModelPos = { x: modelPos.x, y: modelPos.y };
+							draggedEntities = [{ item: selectedEntities[0], x: pFound.x, y: pFound.y }];
 							requestRender();
-							return; 
+							return;
 						}
 					}
 
@@ -2127,6 +2592,10 @@
 									if (isPointNearLine(modelPos.x, modelPos.y, s.points[i].x, s.points[i].y, s.points[i+1].x, s.points[i+1].y)) return true;
 								}
 								return false;
+							} else if (s.type === 'DRAW_ARC') {
+								let axMin = Math.min(s.p1.x, s.p2.x, s.p3.x) - 4, axMax = Math.max(s.p1.x, s.p2.x, s.p3.x) + 4;
+								let ayMin = Math.min(s.p1.y, s.p2.y, s.p3.y) - 4, ayMax = Math.max(s.p1.y, s.p2.y, s.p3.y) + 4;
+								return modelPos.x >= axMin && modelPos.x <= axMax && modelPos.y >= ayMin && modelPos.y <= ayMax;
 							} else {
 								let xMin = Math.min(s.x1, s.x2), xMax = Math.max(s.x1, s.x2);
 								let yMin = Math.min(s.y1, s.y2), yMax = Math.max(s.y1, s.y2);
@@ -2150,10 +2619,13 @@
 						} else {
 							selectedEntities = [{ entity: foundItem, type: foundType }]; openInspector(foundItem, foundType);
 						}
+						pendingDragSnapshot = serializeProjectData();
 						isDraggingEntity = true; initialMouseModelPos = { x: modelPos.x, y: modelPos.y };
 						draggedEntities = selectedEntities.map(item => {
 							if (item.type === 'SHAPE' && item.entity.type === 'DRAW_POLYLINE') {
 								return { item, originalPoints: item.entity.points.map(p => ({...p})) };
+							} else if (item.type === 'SHAPE' && item.entity.type === 'DRAW_ARC') {
+								return { item, p1: {...item.entity.p1}, p2: {...item.entity.p2}, p3: {...item.entity.p3} };
 							} else if (item.type === 'SHAPE' || item.type === 'WIRE') {
 								return { item, x1: item.entity.x1, y1: item.entity.y1, x2: item.entity.x2, y2: item.entity.y2 };
 							} else {
@@ -2175,11 +2647,25 @@
                 const modelPos = transformScreenToModel(e.clientX - rect.left, e.clientY - rect.top);
                 currentMouseModelPos = { x: modelPos.x, y: modelPos.y };
 
-                if (shapeDraftStart || currentMode === 'WIRE' || currentMode === 'DRAW_POLYLINE') {
+                if (shapeDraftStart || currentMode === 'WIRE' || currentMode === 'DRAW_POLYLINE' || currentMode === 'DRAW_ARC') {
                     requestRender();
                 }
 
-                if (isPanningView) { viewPanX = e.clientX - panStartOffset.x; viewPanY = e.clientY - panStartOffset.y; applyTransformMatrix(); return; }
+                if (isFreehandDrawing) {
+                    const last = activePolylinePoints[activePolylinePoints.length - 1];
+                    // Throttle by distance so a fast drag doesn't record a point per
+                    // pixel — keeps the baked polyline's vertex count (and its later
+                    // drag/reshape handle count) reasonable.
+                    if (!last || Math.hypot(modelPos.x - last.x, modelPos.y - last.y) >= 3) {
+                        activePolylinePoints.push({ x: modelPos.x, y: modelPos.y });
+                    }
+                    requestRender(); return;
+                }
+
+                if (isPanningView) {
+                    if (rightClickStartClient && Math.hypot(e.clientX - rightClickStartClient.x, e.clientY - rightClickStartClient.y) > 4) rightClickMoved = true;
+                    viewPanX = e.clientX - panStartOffset.x; viewPanY = e.clientY - panStartOffset.y; applyTransformMatrix(); return;
+                }
                 
                 if (isDraggingPin && dragPinEntity) {
                     if (dragPinType === 'COMP') {
@@ -2219,12 +2705,31 @@
                     requestRender(); return;
                 }
 
+                if (isDraggingShapeHandle && dragShapeHandleEntity) {
+                    const nx = snapToGrid(modelPos.x), ny = snapToGrid(modelPos.y);
+                    if (dragShapeHandleInfo.kind === 'vertex') {
+                        dragShapeHandleEntity.points[dragShapeHandleInfo.index].x = nx;
+                        dragShapeHandleEntity.points[dragShapeHandleInfo.index].y = ny;
+                    } else if (dragShapeHandleInfo.kind === 'arcpt') {
+                        dragShapeHandleEntity['p' + (dragShapeHandleInfo.index + 1)] = { x: nx, y: ny };
+                    } else if (dragShapeHandleInfo.kind === 'p1') {
+                        dragShapeHandleEntity.x1 = nx; dragShapeHandleEntity.y1 = ny;
+                    } else {
+                        dragShapeHandleEntity.x2 = nx; dragShapeHandleEntity.y2 = ny;
+                    }
+                    requestRender(); return;
+                }
+
                 if (isDraggingEntity && draggedEntities.length > 0) {
                     let dx = snapToGrid(modelPos.x - initialMouseModelPos.x);
                     let dy = snapToGrid(modelPos.y - initialMouseModelPos.y);
                     draggedEntities.forEach(d => {
                         if (d.item.type === 'SHAPE' && d.item.entity.type === 'DRAW_POLYLINE') {
                             d.item.entity.points = d.originalPoints.map(p => ({ x: p.x + dx, y: p.y + dy }));
+                        } else if (d.item.type === 'SHAPE' && d.item.entity.type === 'DRAW_ARC') {
+                            d.item.entity.p1 = { x: d.p1.x + dx, y: d.p1.y + dy };
+                            d.item.entity.p2 = { x: d.p2.x + dx, y: d.p2.y + dy };
+                            d.item.entity.p3 = { x: d.p3.x + dx, y: d.p3.y + dy };
                         } else if (d.item.type === 'SHAPE' || d.item.type === 'WIRE') {
                             d.item.entity.x1 = d.x1 + dx; d.item.entity.y1 = d.y1 + dy;
                             d.item.entity.x2 = d.x2 + dx; d.item.entity.y2 = d.y2 + dy;
@@ -2240,7 +2745,8 @@
                 }
             });
 
-            window.addEventListener('mouseup', () => { 
+            window.addEventListener('mouseup', () => {
+                if (isFreehandDrawing) { bakeFreehandPath(); return; }
                 if (isMarqueeSelecting) {
                     let xMin = Math.min(marqueeStart.x, marqueeEnd.x); let xMax = Math.max(marqueeStart.x, marqueeEnd.x);
                     let yMin = Math.min(marqueeStart.y, marqueeEnd.y); let yMax = Math.max(marqueeStart.y, marqueeEnd.y);
@@ -2264,6 +2770,10 @@
                             if (s.type === 'DRAW_POLYLINE') {
                                 let anyPointIn = s.points && s.points.some(p => p.x >= xMin && p.x <= xMax && p.y >= yMin && p.y <= yMax);
                                 if (anyPointIn) selectedEntities.push({ entity: s, type: 'SHAPE' });
+                            } else if (s.type === 'DRAW_ARC') {
+                                let sxMin = Math.min(s.p1.x, s.p2.x, s.p3.x), sxMax = Math.max(s.p1.x, s.p2.x, s.p3.x);
+                                let syMin = Math.min(s.p1.y, s.p2.y, s.p3.y), syMax = Math.max(s.p1.y, s.p2.y, s.p3.y);
+                                if (sxMin >= xMin && sxMax <= xMax && syMin >= yMin && syMax <= yMax) selectedEntities.push({ entity: s, type: 'SHAPE' });
                             } else {
                                 let sxMin = Math.min(s.x1, s.x2); let sxMax = Math.max(s.x1, s.x2);
                                 let syMin = Math.min(s.y1, s.y2); let syMax = Math.max(s.y1, s.y2);
@@ -2290,6 +2800,19 @@
                 }
                 isMarqueeSelecting = false; isDraggingEntity = false; isPanningView = false; isResizing = false; isDraggingPin = false;
                 isDraggingLabel = false; dragLabelEntity = null;
+                isDraggingShapeHandle = false; dragShapeHandleEntity = null; dragShapeHandleInfo = null;
+                // Commit whatever drag just finished onto the undo stack — but only if it
+                // actually changed something, so a plain click-without-moving doesn't
+                // waste an undo slot.
+                if (pendingDragSnapshot !== null) {
+                    const currentSnapshot = serializeProjectData();
+                    if (currentSnapshot !== pendingDragSnapshot) {
+                        undoStack.push(pendingDragSnapshot);
+                        if (undoStack.length > MAX_UNDO) undoStack.shift();
+                        redoStack = [];
+                    }
+                    pendingDragSnapshot = null;
+                }
                 requestRender();
             });
 
@@ -2300,12 +2823,8 @@
 
 				if (e.key === 'Escape') { dropActiveTools(); requestRender(); }
 				if (!inField && (e.key === ' ' || e.code === 'Space')) {
-					let containsComp = selectedEntities.some(item => item.type === 'COMP');
-					if (containsComp) {
-						e.preventDefault();
-						selectedEntities.forEach(item => { if (item.type === 'COMP') item.entity.rotation = ((item.entity.rotation || 0) + 90) % 360; });
-						requestRender();
-					}
+					e.preventDefault();
+					rotateSelectionCW();
 				}
 				if (!inField && (e.key === 'Delete' || e.key === 'Backspace')) {
 					deleteSelectedEntities();
@@ -2316,6 +2835,9 @@
 					else if (key === 'x') { cutSelection(); e.preventDefault(); }
 					else if (key === 'v') { pasteClipboard(); e.preventDefault(); }
 					else if (key === 'g') { e.preventDefault(); if (e.shiftKey) ungroupSelection(); else groupSelection(); }
+					else if (key === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+					else if (key === 'y') { e.preventDefault(); redo(); }
+					else if (key === 'a') { e.preventDefault(); selectAllEntities(); }
 				}
 			});
         }
@@ -2327,6 +2849,8 @@
         function setupTouchSupport() {
             let touchMode = null; // 'draw' | 'gesture'
             let pinchStart = null;
+            const LONG_PRESS_MS = 550, LONG_PRESS_MOVE_TOLERANCE = 10;
+            let longPressTimer = null; let longPressFired = false; let touchStartPoint = null;
 
             function dispatchMouseFromTouch(touch, type) {
                 const evt = new MouseEvent(type, {
@@ -2336,6 +2860,19 @@
                 });
                 (document.elementFromPoint(touch.clientX, touch.clientY) || viewport).dispatchEvent(evt);
             }
+
+            // A fixed-point variant (not tied to a live Touch object) so the delayed
+            // long-press callback can synthesize a mouseup at the point the press
+            // started, even after the original touch event has gone stale.
+            function dispatchMouseAt(x, y, type) {
+                const evt = new MouseEvent(type, {
+                    bubbles: true, cancelable: true, view: window,
+                    clientX: x, clientY: y, button: 0, buttons: type === 'mouseup' ? 0 : 1
+                });
+                (document.elementFromPoint(x, y) || viewport).dispatchEvent(evt);
+            }
+
+            function cancelLongPress() { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } }
 
             function computePinchState(e) {
                 const rect = viewport.getBoundingClientRect();
@@ -2349,8 +2886,21 @@
             viewport.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 1) {
                     touchMode = 'draw';
+                    longPressFired = false;
+                    touchStartPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                     dispatchMouseFromTouch(e.touches[0], 'mousedown');
+                    cancelLongPress();
+                    longPressTimer = setTimeout(() => {
+                        longPressTimer = null; longPressFired = true;
+                        // End whatever the initial synthetic mousedown started (a draw
+                        // draft, a marquee, a drag) before the context menu takes over —
+                        // this is the "won't activate during dragging" guard for touch:
+                        // if the finger had moved, the timer below was already cancelled.
+                        dispatchMouseAt(touchStartPoint.x, touchStartPoint.y, 'mouseup');
+                        openContextMenu(touchStartPoint.x, touchStartPoint.y);
+                    }, LONG_PRESS_MS);
                 } else if (e.touches.length >= 2) {
+                    cancelLongPress();
                     if (touchMode === 'draw') { dispatchMouseFromTouch(e.touches[0], 'mouseup'); }
                     touchMode = 'gesture';
                     const p = computePinchState(e);
@@ -2361,8 +2911,13 @@
 
             viewport.addEventListener('touchmove', (e) => {
                 if (touchMode === 'draw' && e.touches.length === 1) {
-                    dispatchMouseFromTouch(e.touches[0], 'mousemove');
+                    if (longPressTimer && touchStartPoint) {
+                        const moved = Math.hypot(e.touches[0].clientX - touchStartPoint.x, e.touches[0].clientY - touchStartPoint.y);
+                        if (moved > LONG_PRESS_MOVE_TOLERANCE) cancelLongPress();
+                    }
+                    if (!longPressFired) dispatchMouseFromTouch(e.touches[0], 'mousemove');
                 } else if (touchMode === 'gesture' && e.touches.length >= 2) {
+                    cancelLongPress();
                     const p = computePinchState(e);
                     if (!pinchStart) {
                         pinchStart = { dist: p.dist, midX: p.midX, midY: p.midY, scale: viewScale, panX: viewPanX, panY: viewPanY };
@@ -2380,20 +2935,23 @@
             }, { passive: false });
 
             viewport.addEventListener('touchend', (e) => {
-                if (touchMode === 'draw') {
+                cancelLongPress();
+                if (touchMode === 'draw' && !longPressFired) {
                     dispatchMouseFromTouch(e.changedTouches[0], 'mouseup');
                 }
+                longPressFired = false;
                 if (e.touches.length < 2) { pinchStart = null; if (e.touches.length === 0) touchMode = null; }
                 e.preventDefault();
             }, { passive: false });
 
             viewport.addEventListener('touchcancel', (e) => {
-                if (touchMode === 'draw') { dispatchMouseFromTouch(e.changedTouches[0], 'mouseup'); }
-                touchMode = null; pinchStart = null;
+                cancelLongPress();
+                if (touchMode === 'draw' && !longPressFired) { dispatchMouseFromTouch(e.changedTouches[0], 'mouseup'); }
+                longPressFired = false; touchMode = null; pinchStart = null;
             }, { passive: false });
         }
 
-        function setMode(mode) { currentMode = mode; document.getElementById('currentMode').innerText = mode; }
+        function setMode(mode) { currentMode = mode; document.getElementById('currentMode').innerText = mode; refreshCanvasCursor(); }
         
         function updateTitleBlock() {
             projectData.titleBlock.company = document.getElementById('tbCompany').value; projectData.titleBlock.docId = document.getElementById('tbDocId').value;
@@ -2404,6 +2962,17 @@
             projectData.titleBlock.tol2 = document.getElementById('tbTol2').value;
             projectData.titleBlock.tol3 = document.getElementById('tbTol3').value;
             requestRender();
+        }
+
+        // Syncs the title-block input fields FROM projectData (the reverse of
+        // updateTitleBlock above) — needed after loading a project or an undo/redo, since
+        // those replace projectData wholesale without the user typing into the fields.
+        function updateTitleBlockInputsFromData() {
+            const tb = projectData.titleBlock || {};
+            const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+            set('tbDocId', tb.docId); set('tbCompany', tb.company); set('tbDrawnBy', tb.drawnBy);
+            set('tbDate', tb.date); set('tbRev', tb.rev); set('tbSheet', tb.sheet); set('tbSize', tb.size);
+            set('tbTol1', tb.tol1); set('tbTol2', tb.tol2); set('tbTol3', tb.tol3);
         }
 
         const libraryCollapseState = { "Electrical Components": false, "Flow Chart Nodes": true, "Rack Systems Layout": true, "Logic Gates": true };
@@ -2445,7 +3014,7 @@
         }
 
         function createNewFile() { if (confirm("Clear canvas schematic data?")) { projectData.components = []; projectData.wires = []; projectData.customImages = []; projectData.annotations = []; projectData.shapes = []; closeInspector(); resetZoomView(); } }
-        function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData)); const downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", `system_schema.json`); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
+        function exportJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(serializeProjectData()); const downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", `system_schema.json`); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
 
         function exportAsJPG() {
             const savedGrp = selectedEntities; selectedEntities = []; drawCanvas();
@@ -2618,11 +3187,9 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const parsed = JSON.parse(e.target.result); projectData = parsed;
-                    projectData.components.forEach(comp => {
-                        const match = componentLibrary.find(l => l.type === comp.type); if(match) comp.drawVector = match.drawVector;
-                    });
-                    closeInspector(); resetZoomView();
+                    restoreProjectData(e.target.result);
+                    undoStack = []; redoStack = []; // loading a project starts a fresh undo history
+                    resetZoomView();
                 } catch (err) { alert("Error loading configuration blueprint file."); }
             };
             reader.readAsText(file);
